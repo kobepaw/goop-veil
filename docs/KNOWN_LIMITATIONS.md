@@ -29,6 +29,6 @@ This release is a **software-only research preview**.
 - Some advanced features require extras, privileges, or hardware not covered by the default install path.
 
 ## Safety / Compliance
-- goop-veil is designed with conservative guardrails, but it does **not** certify legal or regulatory compliance for a specific deployment.
+- goop-veil is designed with conservative guardrails, but it does **not** certify compliance for a specific deployment.
 - Laws and radio rules vary by jurisdiction and context.
 - Validate reporting and response paths for your own context before relying on outputs.

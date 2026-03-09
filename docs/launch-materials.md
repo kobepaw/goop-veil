@@ -189,7 +189,7 @@ Source: https://github.com/kobepaw/goop-veil
 
 Pure software, zero hardware purchases, 500+ automated tests, Rust core for performance. Supports OpenWrt, UniFi, and TP-Link routers. Linux is currently required for WiFi scanning/capture commands.
 
-The strongest legal tools right now are Illinois BIPA (biometric data) and California CCPA/CPRA (physiological characteristics). If WiFi-derived breathing and heartbeat data qualifies as biometric information -- and there are strong arguments that it does -- then unauthorized collection could carry significant statutory damages.
+Relevant reporting and policy hooks may include privacy, biometric, and consumer-protection frameworks such as Illinois BIPA and California CCPA/CPRA, depending on facts and jurisdiction.
 
 ---
 
@@ -341,20 +341,20 @@ This is not a theoretical concern. The hardware is commodity. The software is op
 
 ## The Regulatory Vacuum
 
-Here is the uncomfortable legal reality: no federal law explicitly prohibits private WiFi CSI sensing.
+Here is the uncomfortable policy reality: no federal rule squarely addresses private WiFi CSI sensing as deployed by non-government actors.
 
-**Kyllo v. United States (2001)** established that government use of technology not in general public use to explore the details of a private home constitutes a Fourth Amendment search. This is directly on point -- thermal imaging through walls is legally analogous to WiFi sensing through walls. But Kyllo only constrains government actors. Your neighbor with three ESP32 devices is not bound by the Fourth Amendment.
+**Kyllo v. United States (2001)** is often discussed because it addressed through-wall sensing by government actors. It is relevant context, but it does not directly settle private-party WiFi sensing scenarios.
 
-**47 USC 333** makes it illegal to "willfully or maliciously interfere with or cause interference to any radio communications." But WiFi sensing does not interfere with communications. It passively analyzes the physical characteristics of signals that are already being transmitted. The statute protects communication content, not signal physics.
+**47 USC 333** is sometimes raised in discussions about radio interference, but WiFi sensing raises different questions around passive analysis of signals already in the environment.
 
-**The Wiretap Act (18 USC 2511)** prohibits intercepting the "contents" of communications. WiFi CSI does not decode communication contents -- it measures how the signal propagates through space. This is a gray area, but current legal interpretation favors the argument that CSI is not "content."
+**The Wiretap Act (18 USC 2511)** is also discussed in this area, but WiFi CSI questions do not map cleanly onto traditional content-interception analysis.
 
 The strongest existing tools are at the state level:
 
 - **Illinois BIPA (740 ILCS 14)**: Protects biometric information with a private right of action and statutory damages of $1,000-$5,000 per violation. If WiFi-derived breathing patterns and heartbeat signatures qualify as "biometric identifiers" or "biometric information" -- and there are strong arguments that they do -- then unauthorized collection would be actionable.
 - **California CCPA/CPRA**: Covers collection of data derived from "physiological or behavioral characteristics." CSI-derived presence, movement, and vital signs data fits squarely within this language.
 
-Legal interpretation of WiFi CSI sensing is still evolving. Documentation quality matters, but legal strategy should come from licensed counsel.
+Interpretation of WiFi CSI sensing is still evolving. Documentation quality matters, but formal strategy should come from qualified professionals for the specific context.
 
 ## Introducing goop-veil
 
@@ -411,12 +411,12 @@ goop-veil mitigate --router-host 192.168.1.1 --router-type openwrt
 
 ### Evidence Bundles
 
-goop-veil generates HMAC-signed evidence bundles for incident records and legal counsel review.
+goop-veil generates HMAC-signed documentation bundles for incident records and reporting/review workflows.
 
 Each evidence package includes timestamped detection logs, device fingerprints with OUI attribution, signal analysis with Fresnel zone calculations, a timeline of sensing activity, and chain-of-custody documentation. Reports are hash-signed for integrity verification.
 
 ```
-goop-veil evidence capture.pcap --output-dir data/legal
+goop-veil evidence capture.pcap --output-dir data/reports
 ```
 
 ## How the Technology Works
@@ -427,7 +427,7 @@ The Rust core handles 802.11 frame parsing at over one million frames per second
 
 The Python layer implements the detection engine (beacon scanning, traffic analysis, CSI signature matching, alert generation), router adapters for mitigation, traffic orchestration, the evidence pipeline, and the CLI. An adaptive defense system uses Thompson sampling to select and tune countermeasure combinations based on observed effectiveness in your specific environment.
 
-goop-veil includes compliance-oriented operational constraints (for example, avoiding deauth/disassoc behavior and logging actions for review). It does not certify legal or regulatory compliance for a specific deployment.
+goop-veil includes compliance-oriented operational constraints (for example, avoiding deauth/disassoc behavior and logging actions for review). It does not certify compliance for a specific deployment.
 
 ## Getting Started
 
@@ -471,7 +471,7 @@ goop-veil assess --room 4.5x3.5x2.7 --budget 200
 Generate an evidence bundle:
 
 ```bash
-goop-veil evidence scan.pcap --output-dir data/legal
+goop-veil evidence scan.pcap --output-dir data/reports
 ```
 
 goop-veil also runs as an MCP server for integration with AI assistants, and offers a web dashboard for continuous monitoring.
@@ -527,7 +527,7 @@ I want to share an open-source tool I built to address a privacy gap that does n
 - Does not require hardware purchases
 - Does not use PHY-layer techniques (CSI randomization, CSI fuzzing) that require controlling the attacker's transmitter or FPGA hardware
 - Cannot prevent sensing by external devices -- can only detect, degrade, and document
-- Does not claim to be a complete solution. Physical RF shielding (the tool includes a room assessment command) and legal action are complementary
+- Does not claim to be a complete solution. Physical RF shielding (the tool includes a room assessment command) and broader reporting/response steps may also matter
 
 **Install and use:**
 

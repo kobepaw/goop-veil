@@ -109,9 +109,9 @@ Estimated effectiveness: 78%
 Generate an evidence package with chain-of-custody documentation.
 
 ```
-$ goop-veil evidence capture.pcap --output-dir data/legal
+$ goop-veil evidence capture.pcap --output-dir data/reports
 Evidence Package Generated
-Output: data/legal/evidence_20260308_143022/
+Output: data/reports/evidence_20260308_143022/
 Report hash: a3f8c91b2d4e7f01...
 Devices documented: 2
 Timeline events: 47
@@ -174,7 +174,7 @@ System status and WiFi interface diagnostics.
 
 **BroRL adaptive defense** -- Thompson sampling selects and adapts countermeasure techniques based on observed effectiveness. Learns which combinations work against the specific sensing hardware detected in your environment.
 
-**Compliance-oriented guardrails (not certification)** -- The software is designed to avoid deauth/disassoc traffic and to use conservative power-related defaults where supported by router APIs. Logs can aid review, but this project does not certify legal or regulatory compliance for any deployment.
+**Compliance-oriented guardrails (not certification)** -- The software is designed to avoid deauth/disassoc traffic and to use conservative power-related defaults where supported by router APIs. Logs can aid review, but this project does not certify compliance for any specific deployment.
 
 ---
 
@@ -213,7 +213,7 @@ Reporting and regulatory outcomes are jurisdiction-specific and evolving. goop-v
 - Detection confidence is heuristic and should be treated as a lead, not a definitive attribution.
 - Mitigation effectiveness depends on router model/firmware, RF conditions, and attacker behavior.
 - Evidence bundles provide integrity-oriented logging, not courtroom admissibility guarantees.
-- The project provides technical tooling only and does not determine legal or regulatory outcomes.
+- The project provides technical tooling only and does not determine reporting or regulatory outcomes.
 
 ---
 
@@ -291,7 +291,7 @@ goop-veil/
     mitigation/
       router/             # OpenWrt, UniFi, TP-Link adapters
       traffic/            # Legitimate traffic orchestration
-      legal/              # Evidence/reporting templates and HMAC-signed logs
+      reporting/          # Evidence/reporting templates and HMAC-signed logs
     mcp/                  # MCP server (7 tools)
     hardware/             # WiFi HAL, ESP32 HAL
     integration/          # goop-net federation bridge
