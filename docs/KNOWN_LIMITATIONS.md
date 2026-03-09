@@ -21,7 +21,8 @@ This release is a **software-only research preview**.
 ## Evidence / Documentation
 - Evidence bundles are technical documentation artifacts.
 - They are **not** determinations and not a guarantee of admissibility in any court, agency, or dispute process.
-- If signing keys are not handled correctly in deployment, later verification may be limited.
+- Durable signed artifacts require an explicit signing key via `VEIL_LOG_SIGNING_KEY` (or direct configuration).
+- Temporary random-key signing is available only as an explicit dev/test mode and is not durably verifiable after the key is lost.
 
 ## Platform / Support
 - No Windows support in this release.

@@ -51,6 +51,15 @@ Example:
 PYTHONPATH=python pytest tests/test_cli.py tests/test_mitigation -q
 ```
 
+For CI-related or repo-wide changes, these checks are also useful:
+```bash
+PYTHONPATH=python pytest --cov=goop_veil --cov-report=term-missing --cov-report=xml tests -q
+ruff check python tests
+mypy --ignore-missing-imports python/goop_veil
+python scripts/check_secrets.py
+pip-audit
+```
+
 If you cannot run a test locally, say so clearly in the PR.
 
 ## Experimental firmware contributions

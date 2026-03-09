@@ -1,7 +1,8 @@
-"""Exports detection logs with HMAC integrity signatures for chain of custody.
+"""Exports detection logs with explicit HMAC signing semantics.
 
-Provides tamper-evident export of detection results and alerts, suitable
-for use as supporting evidence in legal proceedings or regulatory complaints.
+Provides tamper-evident export of detection results and alerts. Durable signed
+artifacts require an explicit signing key; temporary random-key signing is
+opt-in for dev/test workflows only.
 """
 
 from __future__ import annotations
@@ -23,6 +24,10 @@ logger = logging.getLogger(__name__)
 
 #: Environment variable name for the log signing key (base64 encoded).
 _SIGNING_KEY_ENV_VAR = "VEIL_LOG_SIGNING_KEY"
+
+
+class MissingSigningKeyError(RuntimeError):
+    """Raised when durable signing is requested without a configured key."""
 
 
 def _serialize_model(obj: Any) -> Any:
@@ -75,18 +80,28 @@ class TimestampedLogExporter:
     """Exports detection logs with HMAC-SHA256 integrity signatures.
 
     The signing key can be provided directly, via the VEIL_LOG_SIGNING_KEY
-    environment variable (base64-encoded), or auto-generated (with a warning).
+    environment variable (base64-encoded), or explicitly auto-generated for
+    temporary dev/test artifacts only.
     """
 
-    def __init__(self, signing_key: bytes | None = None) -> None:
+    def __init__(
+        self,
+        signing_key: bytes | None = None,
+        *,
+        allow_temporary_key: bool = False,
+    ) -> None:
         """Initialize the log exporter.
 
         Args:
             signing_key: HMAC signing key as raw bytes. If None, attempts to
-                read from VEIL_LOG_SIGNING_KEY env var (base64-encoded). If
-                still unavailable, generates a random 32-byte key and emits
-                a warning.
+                read from VEIL_LOG_SIGNING_KEY env var (base64-encoded).
+            allow_temporary_key: Explicitly allow generating a random signing
+                key for temporary dev/test artifacts that will not remain
+                durably verifiable after process exit.
         """
+        self._uses_temporary_key = False
+        self._key_source = "explicit"
+
         if signing_key is not None:
             self._signing_key = signing_key
             return
@@ -99,22 +114,43 @@ class TimestampedLogExporter:
                 raise ValueError(
                     f"Failed to decode {_SIGNING_KEY_ENV_VAR} as base64: {exc}"
                 ) from exc
+            self._key_source = "environment"
             return
 
-        # Generate random key as last resort
-        self._signing_key = os.urandom(32)
-        warnings.warn(
+        if allow_temporary_key:
+            self._signing_key = os.urandom(32)
+            self._uses_temporary_key = True
+            self._key_source = "temporary"
+            warnings.warn(
+                "No signing key provided and VEIL_LOG_SIGNING_KEY not set. "
+                "A temporary random key has been generated for dev/test use. "
+                "Artifacts signed with this key are not durably verifiable.",
+                UserWarning,
+                stacklevel=2,
+            )
+            return
+
+        raise MissingSigningKeyError(
             "No signing key provided and VEIL_LOG_SIGNING_KEY not set. "
-            "A random key has been generated. Evidence logs signed with this "
-            "key cannot be verified later unless the key is preserved.",
-            UserWarning,
-            stacklevel=2,
+            "Refusing to create a durably signed artifact without an explicit "
+            f"key. Set {_SIGNING_KEY_ENV_VAR}, pass signing_key=..., or use "
+            "allow_temporary_key=True for explicit dev/test temporary mode."
         )
 
     @property
     def signing_key(self) -> bytes:
-        """Return the current signing key (for preservation)."""
+        """Return the current signing key."""
         return self._signing_key
+
+    @property
+    def verification_mode(self) -> str:
+        """Return whether exported artifacts are durably or temporarily signed."""
+        return "temporary_signed" if self._uses_temporary_key else "signed"
+
+    @property
+    def key_source(self) -> str:
+        """Return how the signing key was sourced."""
+        return self._key_source
 
     def export(
         self,
@@ -140,6 +176,10 @@ class TimestampedLogExporter:
         payload = {
             "exported_at": datetime.now(timezone.utc).isoformat(),
             "version": "1.0",
+            "verification": {
+                "mode": self.verification_mode,
+                "key_source": self.key_source,
+            },
             "alerts": [a.model_dump(mode="json") for a in alerts],
             "detections": [d.model_dump(mode="json") for d in detection_results],
         }
@@ -161,7 +201,12 @@ class TimestampedLogExporter:
         output_json = json.dumps(payload, indent=2, sort_keys=True, default=_serialize_model)
         output_path.write_text(output_json, encoding="utf-8")
 
-        logger.info("Exported log to %s (HMAC: %s...)", output_path, hmac_digest[:16])
+        logger.info(
+            "Exported log to %s (%s, HMAC: %s...)",
+            output_path,
+            self.verification_mode,
+            hmac_digest[:16],
+        )
         return hmac_digest
 
     def verify(self, log_path: str | Path, expected_hmac: str) -> bool:

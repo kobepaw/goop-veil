@@ -152,6 +152,9 @@ class LegalConfig(_VeilBaseConfig):
     #: Include legal disclaimer in evidence packages
     include_disclaimer: bool = True
 
+    #: Allow random-key signing for explicit dev/test temporary artifacts only
+    allow_temporary_signing: bool = False
+
 
 class MitigationConfig(_VeilBaseConfig):
     """T5: Software-only mitigation layer configuration."""

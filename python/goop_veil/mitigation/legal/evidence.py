@@ -1,8 +1,8 @@
 """Evidence package generator for WiFi privacy defense.
 
 Assembles detection results, device fingerprints, and alert data into a
-structured evidence package with HMAC-signed logs and legal document templates.
-This is the main entry point for the legal documentation module.
+structured evidence package with explicitly signed logs and legal document
+templates. Durable signed artifacts require an explicit signing key.
 """
 
 from __future__ import annotations
@@ -12,8 +12,7 @@ import logging
 from datetime import datetime, timezone
 from pathlib import Path
 
-from pydantic import BaseModel, ConfigDict, Field
-
+from goop_veil.config import LegalConfig
 from goop_veil.mitigation.legal.log_exporter import TimestampedLogExporter
 from goop_veil.mitigation.legal.templates import (
     DISCLAIMER,
@@ -43,21 +42,13 @@ def _mask_mac(mac: str | None) -> str:
     return ":".join(parts[:3] + ["xx", "xx", "xx"])
 
 
-class LegalConfig(BaseModel):
-    """Configuration for legal evidence generation."""
-
-    model_config = ConfigDict(frozen=True, extra="forbid")
-
-    output_dir: str = "data/legal"
-    include_disclaimer: bool = True
-
-
 class EvidencePackageGenerator:
     """Generates legal-grade evidence packages from detection results.
 
-    Creates a directory of files including HMAC-signed detection logs,
+    Creates a directory of files including explicitly signed detection logs,
     an evidence report, and optional legal document templates (FCC complaint,
-    cease-and-desist, incident report).
+    cease-and-desist, incident report). Outside explicit temporary mode, a
+    signing key must be supplied directly or via VEIL_LOG_SIGNING_KEY.
     """
 
     def __init__(self, config: LegalConfig | None = None) -> None:
@@ -67,7 +58,9 @@ class EvidencePackageGenerator:
             config: Legal configuration. Uses defaults if not provided.
         """
         self._config = config or LegalConfig()
-        self._log_exporter = TimestampedLogExporter()
+        self._log_exporter = TimestampedLogExporter(
+            allow_temporary_key=self._config.allow_temporary_signing
+        )
         self._fcc_template = FCCComplaintTemplate()
         self._cd_template = CeaseAndDesistTemplate()
         self._incident_template = IncidentReportTemplate()
@@ -86,7 +79,8 @@ class EvidencePackageGenerator:
 
         Creates the following files in the output directory:
             1. evidence_report_{timestamp}.md - Summary of all detections.
-            2. detection_log_{timestamp}.json - HMAC-signed raw detection data.
+            2. detection_log_{timestamp}.json - Signed raw detection data with
+               verification metadata.
             3. fcc_complaint_template.md (if requested).
             4. cease_and_desist_template.md (if requested).
             5. incident_report_template.md (if requested).

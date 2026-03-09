@@ -9,6 +9,7 @@ from pathlib import Path
 import pytest
 
 from goop_veil.mitigation.legal.evidence import EvidencePackageGenerator, LegalConfig
+from goop_veil.mitigation.legal.log_exporter import MissingSigningKeyError
 from goop_veil.mitigation.legal.templates import DISCLAIMER
 from goop_veil.mitigation.models import EvidencePackage
 from goop_veil.models import (
@@ -27,7 +28,10 @@ from goop_veil.models import (
 
 @pytest.fixture
 def legal_config(tmp_path) -> LegalConfig:
-    return LegalConfig(output_dir=str(tmp_path / "evidence"))
+    return LegalConfig(
+        output_dir=str(tmp_path / "evidence"),
+        allow_temporary_signing=True,
+    )
 
 
 @pytest.fixture
@@ -126,10 +130,11 @@ class TestFileCreation:
         json_files = list(out_dir.glob("detection_log_*.json"))
         assert len(json_files) == 1
 
-        # Verify it's valid JSON with HMAC
+        # Verify it's valid JSON with HMAC and explicit verification metadata.
         data = json.loads(json_files[0].read_text())
         assert "hmac" in data
         assert "detections" in data
+        assert data["verification"]["mode"] == "temporary_signed"
 
     def test_creates_fcc_complaint_when_requested(self, generator, sample_detection, legal_config):
         generator.generate([sample_detection], include_fcc_complaint=True)
@@ -273,6 +278,11 @@ class TestThreatSummaryOrdering:
 # ---------------------------------------------------------------------------
 
 class TestEdgeCases:
+
+    def test_missing_signing_key_fails_closed_outside_temporary_mode(self, sample_detection, tmp_path):
+        config = LegalConfig(output_dir=str(tmp_path / "strict"))
+        with pytest.raises(MissingSigningKeyError, match="Refusing to create"):
+            EvidencePackageGenerator(config=config).generate([sample_detection])
 
     def test_with_empty_detection_results(self, generator, legal_config):
         pkg = generator.generate([])

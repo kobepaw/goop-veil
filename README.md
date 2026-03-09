@@ -1,6 +1,6 @@
 # goop-veil
 
-WiFi privacy defense research preview. Detect, mitigate, and document potential WiFi CSI surveillance signals.
+Your WiFi can be used to sense you through walls. goop-veil is a software-only WiFi privacy defense that detects, degrades, and documents potential CSI surveillance using your existing router.
 
 ![License](https://img.shields.io/badge/license-Apache--2.0-blue)
 ![Python](https://img.shields.io/badge/python-3.11%2B-blue)
@@ -12,28 +12,28 @@ WiFi privacy defense research preview. Detect, mitigate, and document potential 
 
 IEEE 802.11bf was ratified in September 2025. It standardized what researchers have known for years: ordinary WiFi signals can detect human presence, movement, breathing, and heartbeat through walls.
 
-- **30M+ homes** already have hardware capable of WiFi sensing.
-- **$10 of ESP32 hardware** can detect your breathing from the next room.
+- **Cheap hardware makes this practical.** A small ESP32 mesh can capture CSI from the next room.
 - **No consent required.** No light turns on. No notification. Nothing.
-- **No federal law** explicitly prohibits private WiFi CSI sensing.
-- **Defense tooling is still early.** This project is a research-preview option.
+- **The impact is physical, not just digital.** Presence, motion, breathing, and heartbeat can all become sensing targets.
+- **Policy still lags the capability.** There is no clear federal ban on private-party WiFi CSI sensing.
+- **Practical defense tooling is still early.** goop-veil is built for detection, degradation, and documentation rather than magical prevention claims.
 
-goop-veil is an open-source research preview that detects potential WiFi sensing activity, applies software-only countermeasures through your existing router, and generates evidence bundles for documentation workflows.
+To our knowledge, goop-veil is the first open-source tool built specifically to programmatically reconfigure existing consumer routers to fight back against WiFi CSI surveillance. It is an open-source research preview that detects potential sensing activity, applies software-only countermeasures through supported routers, and generates evidence bundles for documentation workflows.
 
 ---
 
 ## What goop-veil Does
 
 ### 1. Detect
-Scan your WiFi environment for sensing devices. Identifies Espressif mesh networks, suspicious traffic patterns, rapid channel hopping, and CSI extraction signatures. No root required for basic scans.
+Scan your WiFi environment for sensing devices and suspicious conditions. Identifies Espressif mesh networks, suspicious traffic patterns, rapid channel hopping, and CSI extraction signatures. No root required for basic scans.
 
-### 2. Mitigate
+### 2. Degrade
 Software-only countermeasures applied through your existing router. No new hardware needed. Reconfigures channel, bandwidth, TX power, band steering, and PMF settings via router APIs (OpenWrt, UniFi, TP-Link). Orchestrates legitimate network traffic to degrade sensing accuracy.
 
 ### 3. Document
 Generates timestamped, HMAC-signed evidence packages for incident documentation and reporting/review workflows.
 
-goop-veil is software-only and currently positioned as a research preview. It is not a determination engine and not a certification product.
+goop-veil is software-only and currently positioned as a research preview. The goal is to make sensing less reliable and better documented, not to promise perfect prevention or attribution.
 
 ---
 
@@ -214,6 +214,15 @@ Reporting and regulatory outcomes are jurisdiction-specific and evolving. goop-v
 - Mitigation effectiveness depends on router model/firmware, RF conditions, and attacker behavior.
 - Evidence bundles provide integrity-oriented logging, not courtroom admissibility guarantees.
 - The project provides technical tooling only and does not determine reporting or regulatory outcomes.
+
+---
+
+## Contributing Paths
+
+If you want to help in week one, start with [CONTRIBUTING.md](./CONTRIBUTING.md).
+
+- Contributors: use the issue templates, then look for `good-first-issue`, docs, detection-quality, or router compatibility work.
+- Maintainers: use [docs/COMMUNITY_LABELS.md](./docs/COMMUNITY_LABELS.md) for label setup and [docs/STARTER_ISSUE_BATCH_WEEK_ONE.md](./docs/STARTER_ISSUE_BATCH_WEEK_ONE.md) to seed the first public issue batch.
 
 ---
 

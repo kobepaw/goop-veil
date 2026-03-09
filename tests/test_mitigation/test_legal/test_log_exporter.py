@@ -10,7 +10,10 @@ from unittest.mock import patch
 
 import pytest
 
-from goop_veil.mitigation.legal.log_exporter import TimestampedLogExporter
+from goop_veil.mitigation.legal.log_exporter import (
+    MissingSigningKeyError,
+    TimestampedLogExporter,
+)
 from goop_veil.models import (
     AlertSeverity,
     DetectionResult,
@@ -101,6 +104,8 @@ class TestExport:
 
         data = json.loads(output.read_text())
         assert data["hmac"] == hmac_hex
+        assert data["verification"]["mode"] == "signed"
+        assert data["verification"]["key_source"] == "explicit"
 
     def test_export_creates_parent_dirs(self, exporter, sample_alert, sample_detection, tmp_path):
         output = tmp_path / "deep" / "nested" / "dir" / "log.json"
@@ -193,13 +198,18 @@ class TestVerify:
 
 class TestKeyManagement:
 
-    def test_random_key_generated_with_warning(self):
+    def test_missing_key_fails_closed_by_default(self):
         with patch.dict(os.environ, {}, clear=True):
-            # Ensure env var is not set
-            os.environ.pop("VEIL_LOG_SIGNING_KEY", None)
-            with pytest.warns(UserWarning, match="random key"):
-                exp = TimestampedLogExporter()
+            with pytest.raises(MissingSigningKeyError, match="Refusing to create"):
+                TimestampedLogExporter()
+
+    def test_temporary_key_requires_explicit_opt_in(self):
+        with patch.dict(os.environ, {}, clear=True):
+            with pytest.warns(UserWarning, match="temporary random key"):
+                exp = TimestampedLogExporter(allow_temporary_key=True)
             assert len(exp.signing_key) == 32
+            assert exp.verification_mode == "temporary_signed"
+            assert exp.key_source == "temporary"
 
     def test_env_var_signing_key(self):
         test_key = b"env-var-test-key-32-bytes-long!!"
@@ -207,6 +217,8 @@ class TestKeyManagement:
         with patch.dict(os.environ, {"VEIL_LOG_SIGNING_KEY": encoded}):
             exp = TimestampedLogExporter()
             assert exp.signing_key == test_key
+            assert exp.verification_mode == "signed"
+            assert exp.key_source == "environment"
 
     def test_explicit_key_takes_precedence(self):
         explicit_key = b"explicit-key-32-bytes-long!!!!!!"
@@ -219,3 +231,13 @@ class TestKeyManagement:
         with patch.dict(os.environ, {"VEIL_LOG_SIGNING_KEY": "not-valid-base64!!!"}):
             with pytest.raises(ValueError, match="Failed to decode"):
                 TimestampedLogExporter()
+
+    def test_temporary_mode_is_recorded_in_exported_log(self, sample_alert, sample_detection, tmp_path):
+        output = tmp_path / "temporary.json"
+        with patch.dict(os.environ, {}, clear=True):
+            with pytest.warns(UserWarning, match="temporary random key"):
+                exporter = TimestampedLogExporter(allow_temporary_key=True)
+        exporter.export([sample_alert], [sample_detection], output)
+        data = json.loads(output.read_text())
+        assert data["verification"]["mode"] == "temporary_signed"
+        assert data["verification"]["key_source"] == "temporary"
