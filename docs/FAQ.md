@@ -1,7 +1,7 @@
 # FAQ
 
 ## What is goop-veil?
-goop-veil is a software-only research preview focused on detecting potential WiFi sensing activity, applying guarded router-based mitigations, and generating documentation artifacts for review.
+goop-veil is a software-only research preview focused on detecting potential WiFi sensing activity, degrading sensing reliability through guarded router-based mitigations, and generating documentation artifacts for review.
 
 ## Does it prove that someone is spying on me?
 No. Detection output should be treated as a technical signal or lead, not definitive proof or attribution.
@@ -13,10 +13,10 @@ No. It is designed to help detect, degrade, and document risk. It does not guara
 Not for the basic software workflows. Some advanced or experimental paths in the repository involve additional hardware, but the initial supported release is software-first.
 
 ## Which platforms are supported?
-This release is Linux-first for WiFi scanning/capture workflows described in the repo.
+This release is Linux-first for the WiFi scanning/capture workflows described in the repo. Other platforms may still be useful for reading docs, reviewing outputs, or developing parts of the codebase, but the primary tested operational path is Linux.
 
 ## Which routers are supported?
-OpenWrt, UniFi, and some TP-Link paths are supported in varying depth. Compatibility depends on model and firmware version.
+OpenWrt and UniFi are the clearest current support paths. TP-Link support is more model-dependent. See [ROUTER_COMPATIBILITY.md](./ROUTER_COMPATIBILITY.md) for the current conservative support matrix and notes.
 
 ## Is it safe to auto-apply router changes?
 Treat router changes carefully. Review recommendations first, prefer dry-run flows, and expect that some changes can affect WiFi behavior.

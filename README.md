@@ -2,6 +2,8 @@
 
 Your WiFi can be used to sense you through walls. goop-veil is a software-only WiFi privacy defense that detects, degrades, and documents potential CSI surveillance using your existing router.
 
+**Research preview. Linux-first for WiFi scanning/capture. Supported router families today: OpenWrt, UniFi, and selected TP-Link paths.**
+
 ![License](https://img.shields.io/badge/license-Apache--2.0-blue)
 ![Python](https://img.shields.io/badge/python-3.11%2B-blue)
 ![Tests](https://img.shields.io/badge/tests-500%2B%20automated-brightgreen)
@@ -40,21 +42,23 @@ goop-veil is software-only and currently positioned as a research preview. The g
 ## Quick Start
 
 ```bash
-# Install from source (requires Rust toolchain for native 802.11 frame parser)
-pip install git+https://github.com/kobepaw/goop-veil.git#egg=goop-veil[cli]
+# Install from source (requires Rust toolchain for the native frame parser)
+pip install 'git+https://github.com/kobepaw/goop-veil.git#egg=goop-veil[cli]'
 
-# Scan nearby networks for sensing devices (no root needed)
+# Scan nearby networks for suspicious sensing indicators (no root needed)
 goop-veil scan
 
 # Analyze a packet capture for sensing activity
 goop-veil detect capture.pcap
 
-# Get mitigation recommendations
+# Review mitigation recommendations before applying any router changes
 goop-veil mitigate
 
-# Generate an evidence package
+# Generate an evidence/documentation package
 goop-veil evidence capture.pcap
 ```
+
+If you are evaluating router support first, see [docs/ROUTER_COMPATIBILITY.md](./docs/ROUTER_COMPATIBILITY.md).
 
 ---
 
@@ -212,6 +216,7 @@ Reporting and regulatory outcomes are jurisdiction-specific and evolving. goop-v
 - Research preview: output quality and false-positive/false-negative rates can vary across environments.
 - Detection confidence is heuristic and should be treated as a lead, not a definitive attribution.
 - Mitigation effectiveness depends on router model/firmware, RF conditions, and attacker behavior.
+- Router support varies by family, model, and firmware; see [docs/ROUTER_COMPATIBILITY.md](./docs/ROUTER_COMPATIBILITY.md).
 - Evidence bundles provide integrity-oriented logging, not courtroom admissibility guarantees.
 - The project provides technical tooling only and does not determine reporting or regulatory outcomes.
 
@@ -228,12 +233,14 @@ If you want to help in week one, start with [CONTRIBUTING.md](./CONTRIBUTING.md)
 
 ## Router Support
 
-| Router | API | WiFi Config | Priority |
+See the full compatibility notes in [docs/ROUTER_COMPATIBILITY.md](./docs/ROUTER_COMPATIBILITY.md).
+
+| Router | Status | Control path | Notes |
 |---|---|---|---|
-| OpenWrt | UCI/ubus JSON-RPC | Full (channel, TX power, bandwidth, beacon, PMF) | Supported |
-| UniFi | REST API | Good (channel, TX power, bandwidth) | Supported |
-| TP-Link | HTTPS (token auth); insecure HTTP opt-in | Model-dependent | Supported |
-| ASUS Merlin | SSH + wl CLI | Moderate | Planned |
+| OpenWrt | Supported | UCI / ubus JSON-RPC | Strongest current support surface |
+| UniFi | Supported | REST API | Good support, controller/device variation applies |
+| TP-Link | Partial | HTTPS token auth | Model-dependent; insecure HTTP is opt-in only |
+| ASUS Merlin | Planned | SSH + `wl` CLI | Investigation work still needed |
 
 Router credentials are passed via the `VEIL_ROUTER_PASSWORD` environment variable. Never stored in config files.
 

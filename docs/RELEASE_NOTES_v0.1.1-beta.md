@@ -25,7 +25,7 @@ Your WiFi can be used to sense you through walls. goop-veil is an open-source re
 
 ## Recommended first steps
 ```bash
-pip install goop-veil[cli]
+pip install 'git+https://github.com/kobepaw/goop-veil.git#egg=goop-veil[cli]'
 goop-veil scan
 goop-veil detect capture.pcap
 goop-veil mitigate
@@ -41,5 +41,6 @@ goop-veil evidence capture.pcap
 
 See also:
 - `docs/KNOWN_LIMITATIONS.md`
+- `docs/ROUTER_COMPATIBILITY.md`
 - `docs/LAUNCH_PACK_2026-03-09.md`
 - `CONTRIBUTING.md`
