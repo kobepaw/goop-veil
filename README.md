@@ -166,13 +166,13 @@ System status and WiFi interface diagnostics.
 
 **Python detection engine** -- Beacon scanner, traffic analyzer, and CSI signature analyzer feed into an alert engine that produces threat assessments with confidence scores.
 
-**Router reconfiguration** -- Programmatic control of consumer routers via their native APIs. OpenWrt (UCI/ubus), UniFi (REST), and TP-Link (HTTP) adapters reconfigure WiFi parameters that degrade sensing accuracy.
+**Router reconfiguration** -- Programmatic control of consumer routers via their native APIs. OpenWrt (SSH+UCI), UniFi (HTTPS REST), and TP-Link (HTTPS; insecure HTTP only with explicit override) adapters reconfigure WiFi parameters that degrade sensing accuracy.
 
 **Traffic orchestration** -- Generates legitimate network traffic (HTTP, DNS, NTP, streaming) across the WiFi channel. Co-channel traffic is the single most effective software-only countermeasure against CSI sensing.
 
 **BroRL adaptive defense** -- Thompson sampling selects and adapts countermeasure techniques based on observed effectiveness. Learns which combinations work against the specific sensing hardware detected in your environment.
 
-**FCC-compliant by design** -- All transmissions stay within Part 15.247 power limits. Every frame is tagged with a legitimate purpose. Signed audit logs prove compliance. The system never sends deauth frames, never exceeds 20 dBm conducted power, and never addresses frames to third-party devices.
+**FCC-compliant by design** -- All transmissions stay within Part 15.247 power limits. Every frame is tagged with a legitimate purpose. Signed audit logs prove compliance. The system never sends deauth/disassoc frames, never exceeds 20 dBm conducted power, and never addresses frames to third-party devices.
 
 ---
 
@@ -211,7 +211,7 @@ All countermeasures are backed by peer-reviewed research.
 |---|---|---|---|
 | OpenWrt | UCI/ubus JSON-RPC | Full (channel, TX power, bandwidth, beacon, PMF) | Supported |
 | UniFi | REST API | Good (channel, TX power, bandwidth) | Supported |
-| TP-Link | HTTP (token auth) | Model-dependent | Supported |
+| TP-Link | HTTPS (token auth); insecure HTTP opt-in | Model-dependent | Supported |
 | ASUS Merlin | SSH + wl CLI | Moderate | Planned |
 
 Router credentials are passed via the `VEIL_ROUTER_PASSWORD` environment variable. Never stored in config files.
@@ -251,7 +251,7 @@ Configure in your MCP client:
 
 - **Python 3.11+**
 - **Rust toolchain** (for building the native frame parser from source)
-- **Linux or macOS** (WiFi scanning requires `iw` or `nmcli` on Linux, `airport` on macOS)
+- **Linux** (`scan` uses `nmcli` or `iw`; monitor capture uses `iw` + `tcpdump`)
 - Root/sudo only required for `capture` command (monitor mode)
 
 ### Optional Dependencies

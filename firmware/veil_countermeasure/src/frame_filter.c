@@ -7,17 +7,14 @@
  * This module is the authoritative safety gate for all transmitted frames.
  * It enforces the following invariants:
  *
- *   1. NEVER send deauth (subtype 0x0C) or disassoc (subtype 0x0A) frames
- *      to any device that is not associated with our own BSS.
+ *   1. NEVER send deauth (subtype 0x0C) or disassoc (subtype 0x0A) frames.
  *   2. NEVER address frames to third-party devices (devices not in our
  *      association table).
  *   3. NEVER allow continuous wave (CW) — only standard framed OFDM.
  *   4. NEVER transmit frames outside channels 1-11 (enforced elsewhere,
  *      but double-checked here).
- *   5. Management frames (type 0x00) that are deauth/disassoc are ONLY
- *      permitted when the destination MAC is in the own-BSS association
- *      table.
- *   6. Broadcast deauth/disassoc frames are ALWAYS rejected.
+ *   5. Management frames (type 0x00) that are deauth/disassoc are ALWAYS
+ *      rejected in this build.
  *
  * This file contains ACTUAL IMPLEMENTATION, not stubs. The safety logic
  * must be fully functional from the first firmware build.
@@ -80,8 +77,7 @@ static const uint8_t BROADCAST_MAC[MAC_ADDR_LEN] = {
 /* ---------------------------------------------------------------------------
  * Own-BSS association table
  *
- * Tracks devices currently associated with our AP. This is the ONLY set of
- * devices to which deauth/disassoc frames may be sent.
+ * Tracks devices currently associated with our AP.
  * --------------------------------------------------------------------------- */
 
 #define MAX_ASSOCIATED_STATIONS  (8)
@@ -256,55 +252,13 @@ frame_filter_result_t frame_filter_validate(const uint8_t *frame, size_t len)
 
         /* 4a. Deauth and disassoc frames require special handling */
         if (is_deauth_or_disassoc(subtype)) {
-
             const char *frame_name = (subtype == FC_SUBTYPE_DEAUTH)
                                      ? "DEAUTH" : "DISASSOC";
-
-            /* RULE: NEVER send broadcast deauth/disassoc.
-             * This would affect all stations on the channel, including
-             * third-party devices. Always rejected. */
-            if (is_broadcast(addr1) || is_multicast(addr1)) {
-                ESP_LOGE(TAG, "BLOCKED: Broadcast/multicast %s frame — "
-                         "would affect non-own devices", frame_name);
-                audit_log_record("SAFETY_BLOCK", frame_name,
-                                 FRAME_FILTER_BROADCAST_DEAUTH, frame,
-                                 MIN_MGMT_FRAME_LEN);
-                return FRAME_FILTER_BROADCAST_DEAUTH;
-            }
-
-            /* RULE: BSSID (Address 3) MUST match our own BSS.
-             * A deauth/disassoc with a third-party BSSID would be
-             * impersonating another AP — always rejected. */
-            if (!is_own_bssid(addr3)) {
-                ESP_LOGE(TAG, "BLOCKED: %s frame with non-own BSSID "
-                         MACSTR " (own: " MACSTR ")",
-                         frame_name, MAC2STR(addr3), MAC2STR(s_own_bssid));
-                audit_log_record("SAFETY_BLOCK", frame_name,
-                                 FRAME_FILTER_FOREIGN_BSSID, frame,
-                                 MIN_MGMT_FRAME_LEN);
-                return FRAME_FILTER_FOREIGN_BSSID;
-            }
-
-            /* RULE: Destination (Address 1) MUST be in our association table.
-             * We only deauth/disassoc stations that are currently associated
-             * with our own AP. */
-            if (!is_own_bss_station(addr1)) {
-                ESP_LOGE(TAG, "BLOCKED: %s to non-associated station "
-                         MACSTR " — not in own BSS",
-                         frame_name, MAC2STR(addr1));
-                audit_log_record("SAFETY_BLOCK", frame_name,
-                                 FRAME_FILTER_NOT_OWN_BSS, frame,
-                                 MIN_MGMT_FRAME_LEN);
-                return FRAME_FILTER_NOT_OWN_BSS;
-            }
-
-            /* All checks passed for deauth/disassoc — this is a legitimate
-             * AP managing its own stations. */
-            ESP_LOGI(TAG, "ALLOWED: %s to own-BSS station " MACSTR,
-                     frame_name, MAC2STR(addr1));
-            audit_log_record("TX_ALLOWED", frame_name,
-                             FRAME_FILTER_PASS, frame, MIN_MGMT_FRAME_LEN);
-            return FRAME_FILTER_PASS;
+            ESP_LOGE(TAG, "BLOCKED: %s frame — disallowed by firmware policy", frame_name);
+            audit_log_record("SAFETY_BLOCK", frame_name,
+                             FRAME_FILTER_DEAUTH_DISALLOWED, frame,
+                             MIN_MGMT_FRAME_LEN);
+            return FRAME_FILTER_DEAUTH_DISALLOWED;
         }
 
         /* 4b. Other management frames (beacon, probe, auth, action, etc.)

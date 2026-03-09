@@ -22,9 +22,25 @@ from goop_veil.mitigation.legal.templates import (
     IncidentReportTemplate,
 )
 from goop_veil.mitigation.models import EvidencePackage
-from goop_veil.models import DetectionResult, VeilAlert
+from goop_veil.models import DetectionResult, ThreatLevel, VeilAlert
 
 logger = logging.getLogger(__name__)
+_THREAT_RANK = {
+    ThreatLevel.NONE: 0,
+    ThreatLevel.LOW: 1,
+    ThreatLevel.MEDIUM: 2,
+    ThreatLevel.HIGH: 3,
+    ThreatLevel.CONFIRMED: 4,
+}
+
+
+def _mask_mac(mac: str | None) -> str:
+    if not mac:
+        return "Unknown"
+    parts = mac.split(":")
+    if len(parts) != 6:
+        return mac
+    return ":".join(parts[:3] + ["xx", "xx", "xx"])
 
 
 class LegalConfig(BaseModel):
@@ -64,6 +80,7 @@ class EvidencePackageGenerator:
         include_fcc_complaint: bool = True,
         include_cease_desist: bool = True,
         include_incident_report: bool = False,
+        redact_sensitive: bool = True,
     ) -> EvidencePackage:
         """Generate complete evidence package.
 
@@ -81,6 +98,7 @@ class EvidencePackageGenerator:
             include_fcc_complaint: Generate FCC complaint template.
             include_cease_desist: Generate cease-and-desist template.
             include_incident_report: Generate incident report template.
+            redact_sensitive: Redact sensitive identifiers in exported artifacts.
 
         Returns:
             EvidencePackage model with metadata about the generated package.
@@ -98,14 +116,23 @@ class EvidencePackageGenerator:
 
         # 3. Build device inventory
         devices = self._extract_devices(detection_results)
+        exported_devices = (
+            self._redact_devices(devices) if redact_sensitive else devices
+        )
 
         # 4. Export HMAC-signed detection log
         log_path = out_dir / f"detection_log_{ts_str}.json"
-        log_hmac = self._log_exporter.export(alerts, detection_results, log_path)
+        log_hmac = self._log_exporter.export(
+            alerts, detection_results, log_path, redact_sensitive=redact_sensitive
+        )
         logger.info("Signed detection log: %s", log_path)
 
         # 5. Render and write evidence report
-        report_md = self._render_evidence_report(detection_results, timeline)
+        report_md = self._render_evidence_report(
+            detection_results,
+            timeline,
+            redact_sensitive=redact_sensitive,
+        )
         report_path = out_dir / f"evidence_report_{ts_str}.md"
         report_path.write_text(report_md, encoding="utf-8")
         logger.info("Evidence report: %s", report_path)
@@ -115,7 +142,7 @@ class EvidencePackageGenerator:
 
         # 7. Generate requested legal templates
         detection_summary = self._build_detection_summary(detection_results)
-        device_dicts = [d for d in devices]
+        device_dicts = [d for d in exported_devices]
 
         if include_fcc_complaint:
             fcc_md = self._fcc_template.render(
@@ -149,7 +176,7 @@ class EvidencePackageGenerator:
         return EvidencePackage(
             timestamp=now,
             detection_results=[d.model_dump(mode="json") for d in detection_results],
-            device_fingerprints=devices,
+            device_fingerprints=exported_devices,
             timeline=timeline,
             output_path=str(out_dir),
             report_hash=report_hash,
@@ -221,8 +248,7 @@ class EvidencePackageGenerator:
         if not results:
             return "No detections recorded."
 
-        threat_levels = [r.threat_level.value for r in results]
-        highest = max(threat_levels)
+        highest_level = max(results, key=lambda r: _THREAT_RANK[r.threat_level]).threat_level.value
         all_caps: set[str] = set()
         for r in results:
             for c in r.detected_capabilities:
@@ -232,7 +258,7 @@ class EvidencePackageGenerator:
         caps_str = ", ".join(sorted(all_caps)) if all_caps else "none"
 
         return (
-            f"{len(results)} detection(s) recorded. Highest threat level: {highest}. "
+            f"{len(results)} detection(s) recorded. Highest threat level: {highest_level}. "
             f"Sensing capabilities detected: {caps_str}. "
             f"Total suspicious devices: {total_devices}."
         )
@@ -241,6 +267,7 @@ class EvidencePackageGenerator:
         self,
         results: list[DetectionResult],
         timeline: list[dict],
+        redact_sensitive: bool = True,
     ) -> str:
         """Render the main evidence report as Markdown.
 
@@ -291,6 +318,8 @@ class EvidencePackageGenerator:
         lines.append("## Device Inventory")
         lines.append("")
         devices = self._extract_devices(results)
+        if redact_sensitive:
+            devices = self._redact_devices(devices)
         if devices:
             lines.append("| MAC Address | Vendor | Espressif | Channels | Frames |")
             lines.append("|---|---|---|---|---|")
@@ -361,6 +390,19 @@ class EvidencePackageGenerator:
         lines.append("")
 
         return "\n".join(lines)
+
+    @staticmethod
+    def _redact_devices(devices: list[dict]) -> list[dict]:
+        redacted: list[dict] = []
+        for dev in devices:
+            clone = dict(dev)
+            clone["mac_address"] = _mask_mac(clone.get("mac_address"))
+            if clone.get("ssid"):
+                clone["ssid"] = "[REDACTED]"
+            if clone.get("vendor") == "Unknown":
+                clone["vendor"] = "Unknown"
+            redacted.append(clone)
+        return redacted
 
     def _hash_file(self, path: Path) -> str:
         """Compute SHA-256 hash of a file.

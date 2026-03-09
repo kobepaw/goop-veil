@@ -42,6 +42,7 @@ def mock_paramiko():
         mock_client_instance = MagicMock()
         paramiko_mod.SSHClient.return_value = mock_client_instance
         paramiko_mod.AutoAddPolicy.return_value = MagicMock()
+        paramiko_mod.RejectPolicy.return_value = MagicMock()
 
         # Default exec_command returns empty stdout/stderr
         stdout_mock = MagicMock()
@@ -101,6 +102,13 @@ class TestConnect:
         assert adapter.connect() is False
         assert adapter._connected is False
 
+    def test_connect_uses_reject_policy_by_default(self, mock_paramiko):
+        adapter = _make_adapter()
+        adapter.connect()
+        mock_paramiko.set_missing_host_key_policy.assert_called_once()
+        policy = mock_paramiko.set_missing_host_key_policy.call_args[0][0]
+        assert policy is not None
+
     def test_connect_without_paramiko(self):
         """Import failure is handled gracefully."""
         with patch.dict("sys.modules", {"paramiko": None}):
@@ -147,6 +155,12 @@ class TestSetChannel:
         assert adapter._current_channel == 1
         assert len(adapter._changes_applied) == 1
         assert "channel=1" in adapter._changes_applied[0]
+
+    def test_channel_invalid_interface_rejected(self, mock_paramiko):
+        adapter = _make_adapter()
+        adapter.connect()
+        result = adapter.set_channel(6, interface="radio0; reboot")
+        assert result is False
 
 
 # ---------------------------------------------------------------------------

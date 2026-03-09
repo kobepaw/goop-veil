@@ -34,6 +34,43 @@ def _serialize_model(obj: Any) -> Any:
     raise TypeError(f"Object of type {type(obj).__name__} is not JSON serializable")
 
 
+def _mask_mac(mac: str | None) -> str | None:
+    if not mac:
+        return mac
+    parts = mac.split(":")
+    if len(parts) != 6:
+        return mac
+    return ":".join(parts[:3] + ["xx", "xx", "xx"])
+
+
+def _mask_ip(ip: str | None) -> str | None:
+    if not ip:
+        return ip
+    if "." in ip:
+        parts = ip.split(".")
+        if len(parts) == 4:
+            return ".".join(parts[:3] + ["x"])
+    return ip
+
+
+def _redact_value(obj: Any) -> Any:
+    if isinstance(obj, dict):
+        redacted: dict[str, Any] = {}
+        for key, value in obj.items():
+            if key in {"mac", "mac_address", "bssid"}:
+                redacted[key] = _mask_mac(value)
+            elif key in {"ip", "ipaddr"}:
+                redacted[key] = _mask_ip(value)
+            elif key in {"hostname", "ssid"} and isinstance(value, str):
+                redacted[key] = "[REDACTED]"
+            else:
+                redacted[key] = _redact_value(value)
+        return redacted
+    if isinstance(obj, list):
+        return [_redact_value(item) for item in obj]
+    return obj
+
+
 class TimestampedLogExporter:
     """Exports detection logs with HMAC-SHA256 integrity signatures.
 
@@ -84,6 +121,7 @@ class TimestampedLogExporter:
         alerts: list[VeilAlert],
         detection_results: list[DetectionResult],
         output_path: str | Path,
+        redact_sensitive: bool = True,
     ) -> str:
         """Export logs as JSON with HMAC-SHA256 integrity signature.
 
@@ -91,6 +129,7 @@ class TimestampedLogExporter:
             alerts: List of VeilAlert instances to include.
             detection_results: List of DetectionResult instances to include.
             output_path: File path for the exported JSON log.
+            redact_sensitive: Redact MAC/IP/SSID/hostname fields.
 
         Returns:
             HMAC-SHA256 hex digest of the exported content.
@@ -104,6 +143,8 @@ class TimestampedLogExporter:
             "alerts": [a.model_dump(mode="json") for a in alerts],
             "detections": [d.model_dump(mode="json") for d in detection_results],
         }
+        if redact_sensitive:
+            payload = _redact_value(payload)
 
         # Serialize to deterministic JSON (sorted keys) for reproducible HMAC
         content_json = json.dumps(payload, sort_keys=True, default=_serialize_model)

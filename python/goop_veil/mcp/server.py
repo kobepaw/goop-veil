@@ -37,6 +37,9 @@ _placement_optimizer = None
 _privacy_enhancer = None
 _brorl_adapter = None
 
+_CONFIRMATION_PHRASE = "APPLY_ROUTER_CHANGES"
+_ACTIVATE_PHRASE = "ACTIVATE_VEIL"
+
 
 def _init():
     """Lazily initialize all components."""
@@ -182,6 +185,7 @@ def _create_mcp_server():
         mode: str = "vitals_privacy",
         power: float = 15.0,
         channel: int = 6,
+        confirmation: str | None = None,
     ) -> str:
         """Activate WiFi privacy enhancement via ESP32 mesh access point.
 
@@ -193,7 +197,15 @@ def _create_mcp_server():
             mode: Privacy mode (vitals_privacy, motion_privacy, full_privacy).
             power: Transmission power in dBm (max 20, must comply with FCC).
             channel: WiFi channel (1-11 for US).
+            confirmation: Must be "ACTIVATE_VEIL" to execute.
         """
+        if confirmation != _ACTIVATE_PHRASE:
+            return json.dumps({
+                "error": "confirmation_required",
+                "required_confirmation": _ACTIVATE_PHRASE,
+                "detail": "Activation is state-changing and requires explicit confirmation.",
+            })
+
         _init()
 
         global _privacy_enhancer
@@ -296,6 +308,7 @@ def _create_mcp_server():
         auto_apply: bool = False,
         router_host: str | None = None,
         router_type: str | None = None,
+        confirmation: str | None = None,
     ) -> str:
         """Analyze WiFi sensing threats and recommend software-only mitigations.
 
@@ -308,7 +321,15 @@ def _create_mcp_server():
             auto_apply: If True, apply safe router changes (dry-run by default).
             router_host: Router hostname/IP for auto-apply.
             router_type: Router type (openwrt/unifi/tplink).
+            confirmation: Must be "APPLY_ROUTER_CHANGES" when auto_apply=True.
         """
+        if auto_apply and confirmation != _CONFIRMATION_PHRASE:
+            return json.dumps({
+                "error": "confirmation_required",
+                "required_confirmation": _CONFIRMATION_PHRASE,
+                "detail": "Router configuration changes are blocked without explicit confirmation.",
+            })
+
         _init()
 
         def _mitigate():
@@ -354,7 +375,7 @@ def _create_mcp_server():
 
             applied = []
             if auto_apply and router_adapter:
-                applied = advisor.auto_apply(plan, dry_run=False)
+                applied = advisor.auto_apply(plan, dry_run=False, confirmed=True)
 
             return plan, applied
 
@@ -385,6 +406,7 @@ def _create_mcp_server():
         output_dir: str = "data/legal",
         include_fcc_complaint: bool = True,
         include_cease_desist: bool = True,
+        redact_sensitive: bool = True,
     ) -> str:
         """Generate a legal evidence package from WiFi sensing detection results.
 
@@ -397,6 +419,7 @@ def _create_mcp_server():
             output_dir: Directory for generated documents.
             include_fcc_complaint: Generate FCC complaint template.
             include_cease_desist: Generate cease-and-desist template.
+            redact_sensitive: Redact device identifiers in exported artifacts.
         """
         _init()
 
@@ -431,6 +454,7 @@ def _create_mcp_server():
                 output_dir=output_dir,
                 include_fcc_complaint=include_fcc_complaint,
                 include_cease_desist=include_cease_desist,
+                redact_sensitive=redact_sensitive,
             )
             return package
 

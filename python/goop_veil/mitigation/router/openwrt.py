@@ -19,6 +19,7 @@ if TYPE_CHECKING:
     from goop_veil.mitigation.models import RouterStatus
 
 logger = logging.getLogger(__name__)
+_INTERFACE_RE = re.compile(r"^radio[0-9]+$")
 
 # Bandwidth to HT mode mapping
 _BW_TO_HTMODE: dict[int, str] = {
@@ -82,7 +83,11 @@ class OpenWrtAdapter(BaseRouterAdapter):
 
         try:
             client = paramiko.SSHClient()
-            client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+            if bool(getattr(self._config, "allow_insecure_host_keys", False)):
+                client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+                logger.warning("OpenWrt SSH host key auto-accept enabled by explicit override")
+            else:
+                client.set_missing_host_key_policy(paramiko.RejectPolicy())
 
             connect_kwargs: dict = {
                 "hostname": self._config.host,
@@ -94,6 +99,11 @@ class OpenWrtAdapter(BaseRouterAdapter):
                 connect_kwargs["key_filename"] = self._config.ssh_key_path
             if self._password:
                 connect_kwargs["password"] = self._password
+            if not self._config.ssh_key_path and not self._password:
+                logger.error(
+                    "OpenWrt authentication requires ssh_key_path or VEIL_ROUTER_PASSWORD"
+                )
+                return False
 
             client.connect(**connect_kwargs)
             self._ssh_client = client
@@ -177,7 +187,9 @@ class OpenWrtAdapter(BaseRouterAdapter):
 
     def set_channel(self, channel: int, interface: str | None = None) -> bool:
         """Set the wireless channel via UCI."""
-        radio = interface or "radio0"
+        radio = self._safe_radio(interface)
+        if radio is None:
+            return False
         cmd = (
             f"uci set wireless.{radio}.channel={channel} "
             f"&& uci commit wireless && wifi reload"
@@ -200,7 +212,9 @@ class OpenWrtAdapter(BaseRouterAdapter):
             )
             return False
 
-        radio = interface or "radio0"
+        radio = self._safe_radio(interface)
+        if radio is None:
+            return False
         cmd = (
             f"uci set wireless.{radio}.htmode={htmode} "
             f"&& uci commit wireless && wifi reload"
@@ -225,7 +239,9 @@ class OpenWrtAdapter(BaseRouterAdapter):
             )
             power_dbm = _MAX_TX_POWER_DBM
 
-        radio = interface or "radio0"
+        radio = self._safe_radio(interface)
+        if radio is None:
+            return False
         tx_int = int(power_dbm)
         cmd = (
             f"uci set wireless.{radio}.txpower={tx_int} "
@@ -263,7 +279,9 @@ class OpenWrtAdapter(BaseRouterAdapter):
             logger.warning("Unsupported band: %s", band)
             return False
 
-        radio = interface or "radio0"
+        radio = self._safe_radio(interface)
+        if radio is None:
+            return False
         cmd = (
             f"uci set wireless.{radio}.hwmode={hwmode} "
             f"&& uci commit wireless && wifi reload"
@@ -385,6 +403,13 @@ class OpenWrtAdapter(BaseRouterAdapter):
     # ------------------------------------------------------------------
     # Internal helpers
     # ------------------------------------------------------------------
+    def _safe_radio(self, interface: str | None) -> str | None:
+        """Validate UCI radio interface token used in SSH command strings."""
+        radio = interface or "radio0"
+        if not _INTERFACE_RE.fullmatch(radio):
+            logger.error("Invalid OpenWrt radio interface: %r", interface)
+            return None
+        return radio
 
     @staticmethod
     def _parse_uci_value(uci_output: str | None, pattern: str) -> str | None:

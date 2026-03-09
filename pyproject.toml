@@ -6,8 +6,10 @@ build-backend = "maturin"
 name = "goop-veil"
 version = "0.1.0"
 description = "WiFi privacy defense system — detection, passive shielding, and active countermeasures"
+readme = "README.md"
 license = {text = "Apache-2.0"}
 requires-python = ">=3.11"
+keywords = ["wifi", "privacy", "network-security", "wireless"]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "License :: OSI Approved :: Apache Software License",

@@ -354,12 +354,18 @@ class MitigationAdvisor:
             summary=summary,
         )
 
-    def auto_apply(self, plan: MitigationPlan, dry_run: bool = True) -> list[str]:
+    def auto_apply(
+        self,
+        plan: MitigationPlan,
+        dry_run: bool = True,
+        confirmed: bool = False,
+    ) -> list[str]:
         """Apply auto-applicable mitigations via the router adapter.
 
         Args:
             plan: MitigationPlan with recommendations.
             dry_run: If True (default), only log what would be applied.
+            confirmed: Explicit confirmation for state-changing actions.
 
         Returns:
             List of applied mitigation titles.
@@ -368,6 +374,9 @@ class MitigationAdvisor:
 
         if dry_run:
             logger.info("Dry run: no changes applied")
+            return applied
+        if not confirmed:
+            logger.warning("Auto-apply requested without explicit confirmation; refusing")
             return applied
 
         if self._router is None:

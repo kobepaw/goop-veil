@@ -106,7 +106,7 @@ What goop-veil does:
 - **Mitigation**: Reconfigures your router (OpenWrt, UniFi, TP-Link) to degrade sensing accuracy. TX power variation alone causes 93% misclassification (Wi-Spoof, JISA 2025). Cover traffic drops detection accuracy to 47% (UChicago, NDSS 2020). Band steering to 5 GHz adds ~22 dB additional wall attenuation.
 - **Legal evidence**: HMAC-signed detection logs, device fingerprints, and chain-of-custody documentation for FCC complaints. No court has ruled on WiFi CSI yet -- the first case will set precedent.
 
-Architecture: Rust core (802.11 frame parsing, FFT, Fresnel zone physics) for performance, Python for usability. 569 tests. FCC Part 15 compliant by design -- never sends deauth frames, never exceeds 20 dBm conducted power. Apache-2.0 license.
+Architecture: Rust core (802.11 frame parsing, FFT, Fresnel zone physics) for performance, Python for usability. 569 tests. FCC Part 15 compliant by design -- never sends deauth/disassoc frames, never exceeds 20 dBm conducted power. Apache-2.0 license.
 
 Install: `pip install goop-veil[cli]`
 
@@ -115,7 +115,7 @@ Happy to answer questions about the signal physics, legal landscape, or counterm
 ### Key Points to Address for HN Commenters
 
 **"Is this legal?"**
-Yes. All countermeasures use legitimate network traffic and standard router configuration changes (channel, TX power, bandwidth, PMF). The system never sends deauth frames, never exceeds FCC Part 15.247 power limits (20 dBm conducted), and never addresses frames to third-party devices. Every transmission is tagged with a legitimate purpose and audit-logged. The compliance module (`compliance.py`) enforces terminology and power limits at the code level.
+Yes. All countermeasures use legitimate network traffic and standard router configuration changes (channel, TX power, bandwidth, PMF). The system never sends deauth/disassoc frames, never exceeds FCC Part 15.247 power limits (20 dBm conducted), and never addresses frames to third-party devices. Every transmission is tagged with a legitimate purpose and audit-logged. The compliance module (`compliance.py`) enforces terminology and power limits at the code level.
 
 **"Does this actually work?"**
 Every mitigation is backed by peer-reviewed research with measured effectiveness. Co-channel traffic: detection drops to 47% (UChicago "Et Tu Alexa," NDSS 2020). TX power variation: 93% misclassification (Wi-Spoof, JISA 2025). Band steering to 5 GHz: ~45 dB wall attenuation vs ~23 dB at 2.4 GHz (ITU-R P.2040). Bandwidth widening (80/160 MHz): invalidates trained sensing models. The mitigation implementation plan cites all sources.
@@ -124,7 +124,7 @@ Every mitigation is backed by peer-reviewed research with measured effectiveness
 goop-veil includes a room vulnerability assessment command (`goop-veil assess`) that recommends physical materials. But most people rent, cannot modify walls, or need a solution today. Software-only countermeasures applied through your existing router work immediately with zero hardware purchases.
 
 **"What routers are supported?"**
-OpenWrt (UCI/ubus, full control), UniFi (REST API, good control), TP-Link (HTTP, model-dependent). ASUS Merlin planned. The `BaseRouterAdapter` ABC makes it straightforward to add new adapters.
+OpenWrt (SSH+UCI, full control), UniFi (HTTPS REST API, good control), TP-Link (HTTPS, model-dependent; insecure HTTP only with explicit override). ASUS Merlin planned. The `BaseRouterAdapter` ABC makes it straightforward to add new adapters.
 
 **"Why Rust + Python?"**
 802.11 frame parsing at >1M frames/sec needs native performance. The Rust core handles frame classification, FFT/spectral analysis, Fresnel zone physics, OUI lookups (250K+ entries), and signal propagation modeling. Python handles the detection engine, router APIs, traffic orchestration, and CLI. Built with maturin/PyO3.
@@ -176,7 +176,7 @@ goop-veil scan
 
 Source: https://github.com/kobepaw/goop-veil
 
-Pure software, zero hardware purchases, 569 tests, Rust core for performance. Supports OpenWrt, UniFi, and TP-Link routers. Works on Linux and macOS.
+Pure software, zero hardware purchases, 569 tests, Rust core for performance. Supports OpenWrt, UniFi, and TP-Link routers. Linux is currently required for WiFi scanning/capture commands.
 
 The strongest legal tools right now are Illinois BIPA (biometric data) and California CCPA/CPRA (physiological characteristics). If WiFi-derived breathing and heartbeat data qualifies as biometric information -- and there are strong arguments that it does -- then unauthorized collection could carry significant statutory damages.
 
@@ -198,7 +198,7 @@ An attacker deploys 2-3 ESP32 devices (~$5 each) forming a sensing mesh. They ca
 
 - **Rust core** (PyO3/maturin): 802.11 frame parsing at >1M frames/sec, FFT spectral analysis, Fresnel zone body intersection calculations, OUI database (250K+ entries), CSI perturbation modeling, material attenuation calculations
 - **Python detection engine**: Beacon scanner (Espressif OUI, suspicious SSID patterns, mesh topology), traffic analyzer (channel hopping detection, null data ratios, action frame analysis), CSI signature matching, alert engine with confidence scoring
-- **Router adapters**: OpenWrt (UCI/ubus JSON-RPC), UniFi (REST), TP-Link (HTTP token auth). ABC-based, easy to extend
+- **Router adapters**: OpenWrt (SSH+UCI), UniFi (HTTPS REST), TP-Link (HTTPS token auth). ABC-based, easy to extend
 - **Countermeasures**: Ranked by measured effectiveness with auto-apply capability
 - **Legal evidence**: HMAC-signed logs, timestamped device fingerprints, chain-of-custody documentation
 
@@ -221,7 +221,7 @@ PHY-layer CSI randomization (MIMOCrypt, AntiSense) requires controlling the tran
 
 All transmissions stay within Part 15.247 limits. Never sends deauth frames, never exceeds 20 dBm conducted, never addresses frames to third-party devices. Signed audit logs prove compliance. The compliance module enforces this at the code level with prohibited terminology checks and hardware PA cutoffs.
 
-569 tests (Python + Rust), Apache-2.0. Supports Linux and macOS.
+569 tests (Python + Rust), Apache-2.0. Linux support for WiFi scanning/capture.
 
 ```
 pip install goop-veil[cli]
@@ -251,7 +251,7 @@ I built goop-veil because no defense tool existed.
 
 1. `goop-veil scan` -- scans your WiFi environment for sensing devices. Flags Espressif hardware (the most common CSI sensing platform), hidden SSIDs, suspicious mesh topologies. No root needed, works with any WiFi adapter.
 
-2. `goop-veil mitigate --router-host 192.168.1.1 --router-type openwrt` -- analyzes your router configuration and applies countermeasures. Supports OpenWrt (full control via UCI/ubus), UniFi (REST API), and TP-Link (HTTP). Changes include:
+2. `goop-veil mitigate --router-host 192.168.1.1 --router-type openwrt` -- analyzes your router configuration and applies countermeasures. Supports OpenWrt (full control via SSH+UCI), UniFi (HTTPS REST API), and TP-Link (HTTPS). Changes include:
    - TX power variation (93% misclassification per Wi-Spoof 2025)
    - Band steering to 5 GHz (~22 dB additional wall attenuation)
    - Channel hopping (breaks CSI temporal coherence)
@@ -349,7 +349,7 @@ No court has ever ruled on WiFi CSI sensing. The first case will set precedent t
 
 goop-veil is the first open-source tool for detecting WiFi sensing activity, applying software-only countermeasures through your existing router, and generating legal evidence packages. It is available today under the Apache-2.0 license.
 
-It is pure software. There is nothing to buy. You install it with pip and run it on any Linux or macOS machine with a WiFi adapter.
+It is pure software. There is nothing to buy. You install it with pip and run it on a Linux machine with a WiFi adapter.
 
 ```
 pip install goop-veil[cli]
@@ -392,7 +392,7 @@ goop-veil can reconfigure your router to degrade WiFi sensing accuracy. Every co
 
 **PMF (802.11w)**: Protected Management Frames prevent an attacker from forcing your devices to disassociate and reconnect on a channel the attacker controls.
 
-These countermeasures are applied through your router's native API. goop-veil supports OpenWrt (UCI/ubus), UniFi (REST API), and TP-Link (HTTP) routers. Dry-run mode is the default -- you see what would change before anything is applied.
+These countermeasures are applied through your router's native API. goop-veil supports OpenWrt (SSH+UCI), UniFi (HTTPS REST API), and TP-Link (HTTPS) routers. Dry-run mode is the default -- you see what would change before anything is applied.
 
 ```
 goop-veil mitigate --router-host 192.168.1.1 --router-type openwrt
@@ -416,7 +416,7 @@ The Rust core handles 802.11 frame parsing at over one million frames per second
 
 The Python layer implements the detection engine (beacon scanning, traffic analysis, CSI signature matching, alert generation), router adapters for mitigation, traffic orchestration, the legal evidence pipeline, and the CLI. An adaptive defense system uses Thompson sampling to select and tune countermeasure combinations based on observed effectiveness in your specific environment.
 
-Every transmission generated by goop-veil stays within FCC Part 15.247 power limits. Every frame is tagged with a legitimate purpose. Signed audit logs prove compliance. The system never sends deauthentication frames, never exceeds 20 dBm conducted power, and never addresses frames to third-party devices. This is enforced at the code level through a compliance module that prohibits specific terminology and caps power output with hardware-level cutoffs.
+Every transmission generated by goop-veil stays within FCC Part 15.247 power limits. Every frame is tagged with a legitimate purpose. Signed audit logs prove compliance. The system never sends deauth/disassoc frames, never exceeds 20 dBm conducted power, and never addresses frames to third-party devices. This is enforced at the code level through a compliance module that prohibits specific terminology and caps power output with hardware-level cutoffs.
 
 ## Getting Started
 
@@ -509,7 +509,7 @@ I want to share an open-source tool I built to address a privacy gap that does n
 - No cloud services, no telemetry, no accounts. All data stays local
 - Router credentials via environment variable only, never stored in config
 - Apache-2.0 license
-- FCC Part 15.247 compliant -- never sends deauth frames, max 20 dBm conducted, audit-logged
+- FCC Part 15.247 compliant -- never sends deauth/disassoc frames, max 20 dBm conducted, audit-logged
 
 **What it does NOT do:**
 
@@ -546,7 +546,7 @@ Detection, mitigation, and legal evidence generation for WiFi CSI (Channel State
 
 - **WiFi scanning** -- detect sensing devices in your environment (Espressif hardware, suspicious mesh topologies, 802.11bf signatures). No root required for basic scans
 - **Pcap analysis** -- deep 802.11 frame analysis with threat assessment and confidence scoring
-- **Router countermeasures** -- software-only mitigations applied through your existing router's API. Supports OpenWrt (UCI/ubus), UniFi (REST), and TP-Link (HTTP). TX power variation, band steering, channel hopping, bandwidth widening, beamforming disable, PMF enable, beacon interval adjustment
+- **Router countermeasures** -- software-only mitigations applied through your existing router's API. Supports OpenWrt (SSH+UCI), UniFi (HTTPS REST), and TP-Link (HTTPS). TX power variation, band steering, channel hopping, bandwidth widening, beamforming disable, PMF enable, beacon interval adjustment
 - **Traffic orchestration** -- legitimate co-channel traffic generation to degrade sensing accuracy
 - **Room vulnerability assessment** -- physical material recommendations with cost estimates
 - **Legal evidence packages** -- HMAC-signed detection logs, device fingerprints, and chain-of-custody documentation for FCC complaints and privacy claims

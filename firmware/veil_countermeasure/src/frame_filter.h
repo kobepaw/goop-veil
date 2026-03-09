@@ -28,6 +28,7 @@ typedef enum {
     FRAME_FILTER_NOT_OWN_BSS     = -4,  /**< Destination not in own BSS table */
     FRAME_FILTER_NOT_INITIALIZED = -5,  /**< Filter not initialized */
     FRAME_FILTER_NO_BSSID        = -6,  /**< Own BSSID not yet known */
+    FRAME_FILTER_DEAUTH_DISALLOWED = -7, /**< Deauth/disassoc disabled in this build */
 } frame_filter_result_t;
 
 /**

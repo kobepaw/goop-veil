@@ -51,8 +51,9 @@ class SignatureRecord:
 class NetSharingBridge:
     """Shares WiFi sensing signatures with the goop-net federation."""
 
-    def __init__(self, data_dir: str = "data") -> None:
+    def __init__(self, data_dir: str = "data", redact_sensitive: bool = True) -> None:
         self._data_dir = Path(data_dir)
+        self._redact_sensitive = redact_sensitive
         self._signatures: list[SignatureRecord] = []
         self._load_signatures()
 
@@ -74,7 +75,7 @@ class NetSharingBridge:
             sig = SignatureRecord(
                 mac_prefix=mac_prefix,
                 vendor=device.vendor,
-                ssid_pattern=device.ssid,
+                ssid_pattern=self._sanitize_ssid(device.ssid),
                 anomaly_types=anomaly_types,
                 confidence=result.confidence,
             )
@@ -139,6 +140,14 @@ class NetSharingBridge:
                     )
             except Exception:
                 logger.exception("Failed to load signatures")
+
+    def _sanitize_ssid(self, ssid: str | None) -> str | None:
+        """Avoid sharing full SSID values by default."""
+        if not ssid:
+            return None
+        if not self._redact_sensitive:
+            return ssid
+        return "[REDACTED]"
 
     @property
     def known_signatures(self) -> list[SignatureRecord]:

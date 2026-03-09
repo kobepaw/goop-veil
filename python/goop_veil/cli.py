@@ -20,15 +20,59 @@ try:
     import typer
     from rich.console import Console
     from rich.table import Table
+    _CLI_DEPS_AVAILABLE = True
 except ImportError:
-    print(
-        "CLI extras not installed. Install with:\n"
-        "  pip install goop-veil[cli]\n"
-        "or:\n"
-        "  pip install typer rich",
-        file=sys.stderr,
-    )
-    sys.exit(1)
+    _CLI_DEPS_AVAILABLE = False
+
+    class _TyperShim:
+        """Minimal shim so module import works without optional CLI deps."""
+
+        class Exit(Exception):
+            def __init__(self, code: int = 0) -> None:
+                self.code = code
+                super().__init__(f"CLI unavailable (exit code {code})")
+
+        @staticmethod
+        def Option(default=None, *args, **kwargs):
+            return default
+
+        @staticmethod
+        def Argument(default=None, *args, **kwargs):
+            return default
+
+        class Typer:
+            def __init__(self, *args, **kwargs) -> None:
+                pass
+
+            def command(self, *args, **kwargs):
+                def decorator(func):
+                    return func
+
+                return decorator
+
+            def __call__(self, *args, **kwargs):
+                raise RuntimeError("CLI extras not installed")
+
+    class _ConsoleShim:
+        def print(self, *args, **kwargs) -> None:
+            print(*args)
+
+        def print_json(self, value: str) -> None:
+            print(value)
+
+    class _TableShim:
+        def __init__(self, *args, **kwargs) -> None:
+            pass
+
+        def add_column(self, *args, **kwargs) -> None:
+            pass
+
+        def add_row(self, *args, **kwargs) -> None:
+            pass
+
+    typer = _TyperShim()
+    Console = _ConsoleShim
+    Table = _TableShim
 
 console = Console()
 
@@ -460,7 +504,7 @@ def mitigate(
 
     applied = []
     if auto_apply and router_adapter:
-        applied = advisor.auto_apply(plan, dry_run=False)
+        applied = advisor.auto_apply(plan, dry_run=False, confirmed=True)
 
     if json_output:
         import json
@@ -608,6 +652,15 @@ def status(
 
 def main() -> None:
     """Entry point for goop-veil CLI."""
+    if not _CLI_DEPS_AVAILABLE:
+        print(
+            "CLI extras not installed. Install with:\n"
+            "  pip install goop-veil[cli]\n"
+            "or:\n"
+            "  pip install typer rich",
+            file=sys.stderr,
+        )
+        raise SystemExit(1)
     app()
 
 

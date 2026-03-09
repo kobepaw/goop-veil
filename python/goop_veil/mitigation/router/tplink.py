@@ -9,6 +9,7 @@ from __future__ import annotations
 import hashlib
 import logging
 import os
+import re
 from typing import TYPE_CHECKING, Literal
 
 from goop_veil.mitigation.router.base import BaseRouterAdapter
@@ -18,6 +19,7 @@ if TYPE_CHECKING:
     from goop_veil.mitigation.models import RouterStatus
 
 logger = logging.getLogger(__name__)
+_HOST_RE = re.compile(r"^[A-Za-z0-9._:-]+$")
 
 
 class TPLinkAdapter(BaseRouterAdapter):
@@ -35,7 +37,11 @@ class TPLinkAdapter(BaseRouterAdapter):
         self._client = None
         self._tplink_client = None
         self._connected = False
-        self._base_url = f"http://{config.host}"
+        host = config.host.strip()
+        if not _HOST_RE.fullmatch(host):
+            raise ValueError(f"Invalid TP-Link host value: {config.host!r}")
+        self._host = host
+        self._base_url = f"https://{host}"
         self._token: str | None = None
         self._current_channel: int | None = None
         self._current_bandwidth_mhz: int | None = None
@@ -95,6 +101,14 @@ class TPLinkAdapter(BaseRouterAdapter):
             return False
 
         try:
+            if not self._password:
+                logger.error("VEIL_ROUTER_PASSWORD is required for TP-Link authentication")
+                return False
+
+            allow_insecure_http = bool(getattr(self._config, "allow_insecure_http", False))
+            if os.environ.get("VEIL_ROUTER_ALLOW_INSECURE_HTTP") == "1":
+                allow_insecure_http = True
+
             self._client = httpx.Client(
                 base_url=self._base_url,
                 timeout=self._config.timeout_sec,
@@ -126,12 +140,53 @@ class TPLinkAdapter(BaseRouterAdapter):
                 )
 
             self._connected = True
-            logger.info("Connected to TP-Link router at %s via HTTP", self._config.host)
+            logger.info("Connected to TP-Link router at %s via HTTPS", self._config.host)
             return True
         except Exception:
-            logger.exception("Failed to connect to TP-Link router at %s", self._config.host)
-            self._connected = False
-            return False
+            if not allow_insecure_http:
+                logger.exception(
+                    "Failed to connect to TP-Link router at %s over HTTPS "
+                    "(insecure HTTP fallback disabled by default)",
+                    self._config.host,
+                )
+                self._connected = False
+                return False
+
+            logger.warning(
+                "Falling back to insecure HTTP for TP-Link due to explicit override"
+            )
+            try:
+                self._base_url = f"http://{self._host}"
+                self._client = httpx.Client(
+                    base_url=self._base_url,
+                    timeout=self._config.timeout_sec,
+                )
+
+                password_hash = hashlib.md5(  # noqa: S324
+                    self._password.encode()
+                ).hexdigest()
+                resp = self._client.post(
+                    "/",
+                    data={
+                        "operation": "login",
+                        "username": self._config.username,
+                        "password": password_hash,
+                    },
+                )
+                resp.raise_for_status()
+                body = (
+                    resp.json()
+                    if resp.headers.get("content-type", "").startswith("application/json")
+                    else {}
+                )
+                self._token = body.get("stok") or body.get("token")
+                self._connected = True
+                logger.info("Connected to TP-Link router at %s via insecure HTTP", self._config.host)
+                return True
+            except Exception:
+                logger.exception("Failed to connect to TP-Link router at %s", self._config.host)
+                self._connected = False
+                return False
 
     def disconnect(self) -> None:
         """Close the connection to the TP-Link router."""

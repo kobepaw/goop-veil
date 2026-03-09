@@ -246,7 +246,7 @@ class TestAutoApply:
         advisor, router = _make_advisor_with_mock()
         detection = _make_detection(ThreatLevel.HIGH)
         plan = advisor.assess_and_recommend(detection)
-        applied = advisor.auto_apply(plan, dry_run=False)
+        applied = advisor.auto_apply(plan, dry_run=False, confirmed=True)
         # Should have applied at least some auto-applicable mitigations
         assert len(applied) >= 1
 
@@ -254,7 +254,7 @@ class TestAutoApply:
         advisor, router = _make_advisor_with_mock()
         detection = _make_detection(ThreatLevel.HIGH)
         plan = advisor.assess_and_recommend(detection)
-        advisor.auto_apply(plan, dry_run=False)
+        advisor.auto_apply(plan, dry_run=False, confirmed=True)
         # Mock router should have recorded commands beyond the initial
         # connect + get_status + get_neighbor_aps
         assert len(router.commands) > 3
@@ -263,17 +263,24 @@ class TestAutoApply:
         advisor = MitigationAdvisor()
         detection = _make_detection(ThreatLevel.HIGH)
         plan = advisor.assess_and_recommend(detection)
-        applied = advisor.auto_apply(plan, dry_run=False)
+        applied = advisor.auto_apply(plan, dry_run=False, confirmed=True)
         assert applied == []
 
     def test_legal_not_auto_applied(self):
         advisor, router = _make_advisor_with_mock()
         detection = _make_detection(ThreatLevel.CONFIRMED)
         plan = advisor.assess_and_recommend(detection)
-        applied = advisor.auto_apply(plan, dry_run=False)
+        applied = advisor.auto_apply(plan, dry_run=False, confirmed=True)
         # Legal action should never be auto-applied
         for title in applied:
             assert "legal" not in title.lower()
+
+    def test_auto_apply_without_confirmation_returns_empty(self):
+        advisor, _router = _make_advisor_with_mock()
+        detection = _make_detection(ThreatLevel.HIGH)
+        plan = advisor.assess_and_recommend(detection)
+        applied = advisor.auto_apply(plan, dry_run=False, confirmed=False)
+        assert applied == []
 
 
 # ---------------------------------------------------------------------------

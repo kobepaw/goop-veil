@@ -127,6 +127,22 @@ class TestExport:
         assert len(data["alerts"]) == 2
         assert len(data["detections"]) == 2
 
+    def test_export_redacts_sensitive_fields_by_default(
+        self, exporter, sample_alert, sample_detection, tmp_path,
+    ):
+        output = tmp_path / "redacted.json"
+        exporter.export([sample_alert], [sample_detection], output)
+        data = json.loads(output.read_text())
+        dev = data["detections"][0]["devices"][0]
+        assert dev["mac_address"].endswith(":xx:xx:xx")
+
+    def test_export_can_disable_redaction(self, exporter, sample_alert, sample_detection, tmp_path):
+        output = tmp_path / "full.json"
+        exporter.export([sample_alert], [sample_detection], output, redact_sensitive=False)
+        data = json.loads(output.read_text())
+        dev = data["detections"][0]["devices"][0]
+        assert dev["mac_address"] == "24:0A:C4:00:11:22"
+
 
 # ---------------------------------------------------------------------------
 # Verify tests

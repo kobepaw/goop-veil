@@ -97,6 +97,13 @@ class TestConnect:
         adapter = _make_adapter()
         assert adapter.connect() is False
 
+    def test_connect_uses_https_by_default(self, mock_httpx_env):
+        mock_httpx, _mock_client = mock_httpx_env
+        adapter = _make_adapter()
+        adapter.connect()
+        call_kwargs = mock_httpx.Client.call_args
+        assert str(call_kwargs.kwargs["base_url"]).startswith("https://")
+
     def test_connect_without_httpx(self):
         """Import failure is handled gracefully."""
         with patch.dict(sys.modules, {"tplinkrouterc": None, "httpx": None}):

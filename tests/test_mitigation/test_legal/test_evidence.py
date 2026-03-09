@@ -216,6 +216,10 @@ class TestEvidencePackageModel:
     def test_device_fingerprints_in_package(self, generator, sample_detection):
         pkg = generator.generate([sample_detection])
         assert len(pkg.device_fingerprints) == 1
+        assert pkg.device_fingerprints[0]["mac_address"] == "24:0A:C4:xx:xx:xx"
+
+    def test_redaction_can_be_disabled(self, generator, sample_detection):
+        pkg = generator.generate([sample_detection], redact_sensitive=False)
         assert pkg.device_fingerprints[0]["mac_address"] == "24:0A:C4:00:11:22"
 
     def test_output_path_set(self, generator, sample_detection, legal_config):
@@ -247,6 +251,21 @@ class TestTimeline:
     def test_timeline_empty_for_no_results(self, generator):
         pkg = generator.generate([])
         assert pkg.timeline == []
+
+
+class TestThreatSummaryOrdering:
+
+    def test_summary_uses_enum_severity_order_not_lexicographic(self, generator, sample_detection):
+        medium = DetectionResult(
+            timestamp=datetime(2026, 3, 1, 7, 0, 0, tzinfo=timezone.utc),
+            threat_level=ThreatLevel.MEDIUM,
+        )
+        confirmed = DetectionResult(
+            timestamp=datetime(2026, 3, 1, 9, 0, 0, tzinfo=timezone.utc),
+            threat_level=ThreatLevel.CONFIRMED,
+        )
+        summary = generator._build_detection_summary([medium, sample_detection, confirmed])
+        assert "Highest threat level: confirmed" in summary
 
 
 # ---------------------------------------------------------------------------

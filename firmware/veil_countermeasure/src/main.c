@@ -27,6 +27,7 @@
 #include "esp_log.h"
 #include "esp_err.h"
 #include "nvs_flash.h"
+#include "nvs.h"
 #include "driver/gpio.h"
 #include "driver/adc.h"
 #include "esp_adc/adc_oneshot.h"
@@ -66,6 +67,17 @@ static const char *TAG = "veil_main";
 
 static EventGroupHandle_t s_evt_group;
 static SemaphoreHandle_t  s_tx_mutex;
+
+/* Provisioning keys in NVS namespace "veil" */
+#define NVS_NS_VEIL                "veil"
+#define NVS_KEY_AP_SSID            "ap_ssid"
+#define NVS_KEY_AP_PSK             "ap_psk"
+#define WIFI_MIN_PSK_LEN           (8)
+#define WIFI_MAX_PSK_LEN           (63)
+
+/* Populated from NVS before WiFi startup */
+static char s_ap_ssid[33];
+static char s_ap_psk[65];
 
 /* ---------------------------------------------------------------------------
  * WiFi event handler
@@ -119,6 +131,47 @@ static esp_err_t init_nvs(void)
     return ret;
 }
 
+static esp_err_t load_ap_credentials_from_nvs(void)
+{
+    nvs_handle_t handle;
+    esp_err_t ret = nvs_open(NVS_NS_VEIL, NVS_READONLY, &handle);
+    if (ret != ESP_OK) {
+        ESP_LOGE(TAG, "Provisioning missing: NVS namespace '%s' unavailable", NVS_NS_VEIL);
+        return ret;
+    }
+
+    size_t ssid_len = sizeof(s_ap_ssid);
+    size_t psk_len = sizeof(s_ap_psk);
+
+    ret = nvs_get_str(handle, NVS_KEY_AP_SSID, s_ap_ssid, &ssid_len);
+    if (ret != ESP_OK) {
+        ESP_LOGE(TAG, "Provisioning missing: key '%s' not set", NVS_KEY_AP_SSID);
+        nvs_close(handle);
+        return ret;
+    }
+
+    ret = nvs_get_str(handle, NVS_KEY_AP_PSK, s_ap_psk, &psk_len);
+    if (ret != ESP_OK) {
+        ESP_LOGE(TAG, "Provisioning missing: key '%s' not set", NVS_KEY_AP_PSK);
+        nvs_close(handle);
+        return ret;
+    }
+    nvs_close(handle);
+
+    size_t psk_value_len = strlen(s_ap_psk);
+    if (psk_value_len < WIFI_MIN_PSK_LEN || psk_value_len > WIFI_MAX_PSK_LEN) {
+        ESP_LOGE(TAG, "Provisioning invalid: PSK length must be %d..%d",
+                 WIFI_MIN_PSK_LEN, WIFI_MAX_PSK_LEN);
+        return ESP_ERR_INVALID_SIZE;
+    }
+    if (strlen(s_ap_ssid) == 0 || strlen(s_ap_ssid) > 32) {
+        ESP_LOGE(TAG, "Provisioning invalid: SSID length must be 1..32");
+        return ESP_ERR_INVALID_SIZE;
+    }
+
+    return ESP_OK;
+}
+
 /**
  * @brief Initialize WiFi in AP mode with WPA3.
  *
@@ -127,6 +180,12 @@ static esp_err_t init_nvs(void)
  */
 static esp_err_t init_wifi(void)
 {
+    esp_err_t creds_ret = load_ap_credentials_from_nvs();
+    if (creds_ret != ESP_OK) {
+        ESP_LOGE(TAG, "WiFi startup blocked: AP credentials not provisioned");
+        return creds_ret;
+    }
+
     ESP_ERROR_CHECK(esp_netif_init());
     ESP_ERROR_CHECK(esp_event_loop_create_default());
 
@@ -141,8 +200,9 @@ static esp_err_t init_wifi(void)
     /* Configure AP — channel and SSID set by legitimate_functions */
     wifi_config_t wifi_config = {
         .ap = {
-            .ssid = "VEIL-MESH",
-            .ssid_len = 9,
+            .ssid = {0},
+            .password = {0},
+            .ssid_len = 0,
             .channel = 1,
             .authmode = WIFI_AUTH_WPA3_PSK,
             .max_connection = 4,
@@ -152,7 +212,11 @@ static esp_err_t init_wifi(void)
         },
     };
 
-    /* PSK is set from NVS or command interface, not hardcoded */
+    memcpy(wifi_config.ap.ssid, s_ap_ssid, strlen(s_ap_ssid));
+    memcpy(wifi_config.ap.password, s_ap_psk, strlen(s_ap_psk));
+    wifi_config.ap.ssid_len = (uint8_t)strlen(s_ap_ssid);
+
+    /* PSK is provisioned via NVS and required for startup. */
     ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_AP));
     ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_AP, &wifi_config));
 

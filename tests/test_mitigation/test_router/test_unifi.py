@@ -122,11 +122,19 @@ class TestConnect:
         assert adapter.connect() is False
         assert adapter._connected is False
 
-    def test_ssl_verification_disabled(self, mock_httpx_env):
+    def test_ssl_verification_enabled_by_default(self, mock_httpx_env):
         mock_httpx, _mock_client = mock_httpx_env
         adapter = _make_adapter()
         adapter.connect()
-        # Verify Client was created with verify=False
+        # Verify Client was created with verify=True
+        call_kwargs = mock_httpx.Client.call_args
+        assert call_kwargs.kwargs.get("verify") is True
+
+    def test_ssl_verification_can_be_explicitly_disabled(self, mock_httpx_env, monkeypatch):
+        mock_httpx, _mock_client = mock_httpx_env
+        monkeypatch.setenv("VEIL_ROUTER_INSECURE_TLS", "1")
+        adapter = _make_adapter()
+        adapter.connect()
         call_kwargs = mock_httpx.Client.call_args
         assert call_kwargs.kwargs.get("verify") is False
 

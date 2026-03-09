@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import logging
 import os
+import re
 from typing import TYPE_CHECKING, Literal
 
 from goop_veil.mitigation.router.base import BaseRouterAdapter
@@ -17,6 +18,7 @@ if TYPE_CHECKING:
     from goop_veil.mitigation.models import RouterStatus
 
 logger = logging.getLogger(__name__)
+_HOST_RE = re.compile(r"^[A-Za-z0-9._:-]+$")
 
 # Bandwidth to UniFi channel width name
 _BW_TO_UNIFI: dict[int, str] = {
@@ -41,7 +43,10 @@ class UniFiAdapter(BaseRouterAdapter):
         self._config = config
         self._client = None
         self._connected = False
-        self._base_url = f"https://{config.host}:8443"
+        host = config.host.strip()
+        if not _HOST_RE.fullmatch(host):
+            raise ValueError(f"Invalid UniFi host value: {config.host!r}")
+        self._base_url = f"https://{host}:8443"
         self._site = "default"
         self._device_id: str | None = None
         self._current_channel: int | None = None
@@ -66,9 +71,20 @@ class UniFiAdapter(BaseRouterAdapter):
             return False
 
         try:
+            if not self._password:
+                logger.error("VEIL_ROUTER_PASSWORD is required for UniFi authentication")
+                return False
+
+            verify_tls = bool(getattr(self._config, "verify_tls", True))
+            # Explicit opt-out only (kept for lab/self-signed environments).
+            if os.environ.get("VEIL_ROUTER_INSECURE_TLS") == "1":
+                verify_tls = False
+            if not verify_tls:
+                logger.warning("UniFi TLS certificate verification disabled by explicit override")
+
             self._client = httpx.Client(
                 base_url=self._base_url,
-                verify=False,
+                verify=verify_tls,
                 timeout=self._config.timeout_sec,
             )
 
