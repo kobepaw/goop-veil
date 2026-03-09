@@ -1,0 +1,41 @@
+name: Bug report
+description: Report a reproducible bug in goop-veil
+labels: ["type:bug"]
+body:
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: What happened?
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      description: OS, Python version, install method
+  - type: input
+    id: router
+    attributes:
+      label: Router / firmware
+      description: Router model and firmware version if relevant
+  - type: textarea
+    id: repro
+    attributes:
+      label: Reproduction steps
+      description: Exact steps or commands
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+  - type: textarea
+    id: artifacts
+    attributes:
+      label: Logs / artifacts
+      description: Paste redacted logs or describe attached artifacts

@@ -1,0 +1,30 @@
+name: False positive / false negative report
+description: Report questionable detection output
+labels: ["false-positive", "type:research"]
+body:
+  - type: dropdown
+    id: kind
+    attributes:
+      label: Type
+      options:
+        - False positive
+        - False negative
+    validations:
+      required: true
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: What did goop-veil report, and what do you believe is wrong?
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Supporting details
+      description: Relevant redacted logs, pcap details, environment, or reasoning
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      description: OS, adapter, router, firmware, capture method

@@ -1,0 +1,21 @@
+name: Docs / truth-alignment issue
+description: Report docs that do not match implementation or current scope
+labels: ["type:docs", "truth-alignment"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What wording or docs section looks wrong or misleading?
+    validations:
+      required: true
+  - type: input
+    id: location
+    attributes:
+      label: File / section
+      description: README path, docs file, or link
+  - type: textarea
+    id: suggested
+    attributes:
+      label: Suggested correction
+      description: Optional improved wording

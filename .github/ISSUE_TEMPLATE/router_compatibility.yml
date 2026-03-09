@@ -1,0 +1,33 @@
+name: Router compatibility report
+description: Share a tested router/firmware result
+labels: ["area:mitigation-router", "type:research"]
+body:
+  - type: input
+    id: router_model
+    attributes:
+      label: Router model
+    validations:
+      required: true
+  - type: input
+    id: firmware
+    attributes:
+      label: Firmware version
+  - type: dropdown
+    id: router_type
+    attributes:
+      label: Router family
+      options:
+        - OpenWrt
+        - UniFi
+        - TP-Link
+        - Other
+  - type: textarea
+    id: workflow
+    attributes:
+      label: What you tested
+      description: Commands, dry-run/apply, and behavior observed
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Outcome
+      description: What worked, what broke, what was unclear
