@@ -18,10 +18,10 @@ goop-veil is an open-source research preview for detecting potential WiFi sensin
 - removed internal-only release artifacts from the repo surface
 
 ## Important limits
-- This is a **research preview**, not a finished compliance or legal product
+- This is a **research preview**, not a finished compliance or determination product
 - Detection is heuristic and should be treated as a lead, not proof or attribution
 - Mitigation effectiveness varies by environment, router model, and attacker setup
-- Generated artifacts are technical records, not guarantees of admissibility or legal outcome
+- Generated artifacts are technical records, not guarantees of admissibility or official outcome
 - Firmware-related components in the repo are currently experimental and not part of the initial supported release surface
 
 ## Recommended first steps

@@ -4,13 +4,13 @@ Public-facing draft materials for goop-veil v0.1.0.
 
 Messaging guardrails for this file:
 - Frame goop-veil as a software-only research preview.
-- Avoid legal certainty, compliance certification, and guaranteed outcomes.
+- Avoid certainty framing, compliance certification language, and guaranteed outcomes.
 - Avoid "first" and "100%" style claims.
 - Use "500+ automated tests" consistently.
 - Use current CLI syntax (`goop-veil detect <pcap>`, `goop-veil evidence <pcap>`).
 
 Required disclaimer copy (reuse in posts/interviews):
-"goop-veil is a software-only research preview. It provides technical signals and documentation artifacts, not legal advice, legal determinations, or compliance certification. Detection and mitigation results vary by environment."
+"goop-veil is a software-only research preview. It provides technical signals and documentation artifacts, not determinations or compliance certification. Detection and mitigation results vary by environment."
 
 ---
 
@@ -84,7 +84,7 @@ github.com/kobepaw/goop-veil
 
 pip install goop-veil[cli]
 
-Not legal advice. The tool generates documentation artifacts that may assist legal review.
+The tool generates documentation artifacts that may assist reporting and professional review.
 
 Star it. Share it. Protect yourself.
 
@@ -114,18 +114,18 @@ What goop-veil does:
 
 - **Detection**: Scans for Espressif sensing meshes, suspicious traffic patterns, CSI extraction signatures. No root for basic scans.
 - **Mitigation**: Reconfigures your router (OpenWrt, UniFi, TP-Link) to degrade sensing accuracy. TX power variation alone causes 93% misclassification (Wi-Spoof, JISA 2025). Cover traffic drops detection accuracy to 47% (UChicago, NDSS 2020). Band steering to 5 GHz adds ~22 dB additional wall attenuation.
-- **Evidence artifacts**: HMAC-signed detection logs, device fingerprints, and chain-of-custody documentation for incident records and legal counsel review.
+- **Evidence artifacts**: HMAC-signed detection logs, device fingerprints, and chain-of-custody documentation for incident records and reporting/review workflows.
 
 Architecture: Rust core (802.11 frame parsing, FFT, Fresnel zone physics) for performance, Python for usability. 500+ automated tests. Includes compliance-oriented guardrails, but is not a compliance certification tool. Apache-2.0 license.
 
 Install: `pip install goop-veil[cli]`
 
-Happy to answer questions about the signal physics, legal landscape, or countermeasure effectiveness measurements.
+Happy to answer questions about the signal physics, reporting context, or countermeasure effectiveness measurements.
 
 ### Key Points to Address for HN Commenters
 
-**"Is this legal?"**
-The software is technical tooling, not legal advice. It uses ordinary router configuration changes and includes guardrails intended to reduce risky behavior, but users should validate obligations with qualified counsel.
+**"How should people use this?"**
+The software is technical tooling. It uses ordinary router configuration changes and includes guardrails intended to reduce risky behavior, but users should validate obligations and reporting paths for their own context.
 
 
 **"Does this actually work?"**
@@ -176,7 +176,7 @@ I released goop-veil, an open-source tool (Apache-2.0) that does three things:
 
 3. **Documents** incident telemetry. Generates HMAC-signed evidence bundles with device fingerprints, timestamps, and chain-of-custody documentation for records and counsel review.
 
-This is not legal advice. WiFi CSI legal questions are evolving and jurisdiction-specific.
+WiFi CSI reporting and regulatory questions are evolving and jurisdiction-specific.
 
 **How to get it:**
 
@@ -230,7 +230,7 @@ PHY-layer CSI randomization (MIMOCrypt, AntiSense) requires controlling the tran
 
 **Compliance framing:**
 
-Use guardrail language, not certification language. Example: "The software is designed with conservative operational constraints (including avoiding deauth/disassoc behavior) and audit logging, but does not certify legal or regulatory compliance."
+Use guardrail language, not certification language. Example: "The software is designed with conservative operational constraints (including avoiding deauth/disassoc behavior) and audit logging, but does not certify compliance for a specific deployment."
 
 500+ automated tests (Python + Rust), Apache-2.0. Linux support for WiFi scanning/capture.
 
@@ -478,7 +478,7 @@ goop-veil also runs as an MCP server for integration with AI assistants, and off
 
 ## What Comes Next
 
-The legal landscape is evolving. 802.11bf moves WiFi sensing from a research curiosity to a standardized protocol feature. As sensing-capable routers proliferate, regulatory and litigation activity may increase.
+The reporting and regulatory landscape is evolving. 802.11bf moves WiFi sensing from a research curiosity to a standardized protocol feature. As sensing-capable routers proliferate, policy, reporting, and enforcement activity may increase.
 
 Several developments are worth watching:
 
@@ -539,7 +539,7 @@ goop-veil mitigate --router-host 192.168.1.1 --router-type openwrt
 
 Source: https://github.com/kobepaw/goop-veil
 
-I built this because the 802.11bf ratification closed the last remaining argument that WiFi sensing was a niche research concern. It is now a standardized capability, and the defense tooling needs to exist. Feedback on detection accuracy, router adapter coverage, and legal framework assumptions is welcome.
+I built this because the 802.11bf ratification closed the last remaining argument that WiFi sensing was a niche research concern. It is now a standardized capability, and the defense tooling needs to exist. Feedback on detection accuracy, router adapter coverage, and reporting/regulatory assumptions is welcome.
 
 ---
 
@@ -593,7 +593,7 @@ pip install git+https://github.com/kobepaw/goop-veil.git#egg=goop-veil[cli]
 - ESP32 active countermeasure hardware control requires `[active]` extras and serial connection
 - No Windows support in this release
 - Detection and mitigation performance varies by RF environment and adversary behavior
-- Evidence bundles are technical records, not legal advice or admissibility guarantees
+- Evidence bundles are technical records, not admissibility guarantees or official determinations
 
 **Research Citations:**
 

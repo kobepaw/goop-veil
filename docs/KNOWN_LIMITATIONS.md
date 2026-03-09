@@ -20,7 +20,7 @@ This release is a **software-only research preview**.
 
 ## Evidence / Documentation
 - Evidence bundles are technical documentation artifacts.
-- They are **not** legal advice, not a legal determination, and not a guarantee of admissibility in any court, agency, or dispute process.
+- They are **not** determinations and not a guarantee of admissibility in any court, agency, or dispute process.
 - If signing keys are not handled correctly in deployment, later verification may be limited.
 
 ## Platform / Support
@@ -31,4 +31,4 @@ This release is a **software-only research preview**.
 ## Safety / Compliance
 - goop-veil is designed with conservative guardrails, but it does **not** certify legal or regulatory compliance for a specific deployment.
 - Laws and radio rules vary by jurisdiction and context.
-- Consult qualified counsel before relying on outputs for legal or regulatory action.
+- Validate reporting and response paths for your own context before relying on outputs.

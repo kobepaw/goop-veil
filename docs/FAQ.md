@@ -24,11 +24,11 @@ Treat router changes carefully. Review recommendations first, prefer dry-run flo
 ## Does any data leave my machine?
 The project is designed around local workflows. Optional sharing/integration features should be reviewed carefully before use.
 
-## Is this legal to use?
-This repository provides technical tooling, not legal advice. Whether a specific deployment or response is lawful depends on jurisdiction, facts, and context.
+## Can this help with reporting?
+Yes — the project can generate documentation artifacts that may help with internal records and reporting workflows. Whether a specific response path makes sense depends on context.
 
 ## Are the evidence bundles court-ready?
-No guarantee is made that generated artifacts will satisfy any court, regulator, or agency requirement. They are technical documentation artifacts that may help with internal review or counsel review.
+No guarantee is made that generated artifacts will satisfy any court, regulator, or agency requirement. They are technical documentation artifacts that may help with internal review or reporting workflows.
 
 ## What about the firmware in this repo?
 Firmware-related components are currently experimental and are not part of the initial supported public release surface.

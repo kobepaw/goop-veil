@@ -31,9 +31,9 @@ Scan your WiFi environment for sensing devices. Identifies Espressif mesh networ
 Software-only countermeasures applied through your existing router. No new hardware needed. Reconfigures channel, bandwidth, TX power, band steering, and PMF settings via router APIs (OpenWrt, UniFi, TP-Link). Orchestrates legitimate network traffic to degrade sensing accuracy.
 
 ### 3. Document
-Generates timestamped, HMAC-signed evidence packages for incident documentation and legal/administrative review.
+Generates timestamped, HMAC-signed evidence packages for incident documentation and reporting/review workflows.
 
-goop-veil is software-only and currently positioned as a research preview. It is not legal advice, not a legal determination engine, and not a certification product.
+goop-veil is software-only and currently positioned as a research preview. It is not a determination engine and not a certification product.
 
 ---
 
@@ -194,7 +194,7 @@ Countermeasures are informed by peer-reviewed research. Real-world outcomes vary
 
 ---
 
-## Legal Landscape (General Information, Not Legal Advice)
+## Reporting Context and Regulatory Landscape
 
 **No federal law directly prohibits private WiFi CSI sensing.** This is the gap.
 
@@ -203,7 +203,7 @@ Countermeasures are informed by peer-reviewed research. Real-world outcomes vary
 - **Illinois BIPA** provides statutory damages with a private right of action; WiFi-derived breathing/heartbeat data may be argued to qualify in some scenarios.
 - **California CCPA/CPRA** references "physiological or behavioral characteristics"; whether specific CSI-derived inferences qualify is fact-dependent.
 
-Legal outcomes are jurisdiction-specific and evolving. Use licensed counsel for legal analysis. goop-veil can generate timestamped logs and documentation artifacts that may help with internal records or attorney review.
+Reporting and regulatory outcomes are jurisdiction-specific and evolving. goop-veil can generate timestamped logs and documentation artifacts that may help with internal records, reporting workflows, or professional review.
 
 ---
 
@@ -213,7 +213,7 @@ Legal outcomes are jurisdiction-specific and evolving. Use licensed counsel for 
 - Detection confidence is heuristic and should be treated as a lead, not a definitive attribution.
 - Mitigation effectiveness depends on router model/firmware, RF conditions, and attacker behavior.
 - Evidence bundles provide integrity-oriented logging, not courtroom admissibility guarantees.
-- The project provides technical tooling only and does not provide legal advice.
+- The project provides technical tooling only and does not determine legal or regulatory outcomes.
 
 ---
 
@@ -242,7 +242,7 @@ goop-veil exposes 7 tools via the Model Context Protocol for agent-driven WiFi d
 | `deploy_countermeasures` | BroRL-adaptive technique selection |
 | `share_sensing_signature` | Share detection signatures with federation |
 | `mitigate_wifi_sensing` | Recommend and apply router mitigations |
-| `generate_evidence_report` | Legal evidence package generation |
+| `generate_evidence_report` | Evidence package generation |
 
 Configure in your MCP client:
 
@@ -291,7 +291,7 @@ goop-veil/
     mitigation/
       router/             # OpenWrt, UniFi, TP-Link adapters
       traffic/            # Legitimate traffic orchestration
-      legal/              # Evidence packages, FCC templates, HMAC-signed logs
+      legal/              # Evidence/reporting templates and HMAC-signed logs
     mcp/                  # MCP server (7 tools)
     hardware/             # WiFi HAL, ESP32 HAL
     integration/          # goop-net federation bridge

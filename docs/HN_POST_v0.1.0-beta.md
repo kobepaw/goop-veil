@@ -18,7 +18,7 @@ That’s why this release is intentionally scoped and cautious.
 - focused on detect / mitigate / document
 
 **What it is not:**
-- not legal advice
+- not a determination or certification product
 - not a compliance certification product
 - not proof or attribution engine
 - not a finished firmware release

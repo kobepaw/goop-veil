@@ -47,7 +47,7 @@ gh repo edit kobepaw/goop-veil --visibility public --accept-visibility-change-co
 ## Messaging rules
 - Say "software-only research preview"
 - Say "heuristic detection"
-- Say "not legal advice"
+- Avoid implying legal or regulatory determinations
 - Keep firmware experimental
 - Avoid "first/100%/proof/certified" language
 
@@ -55,7 +55,7 @@ gh repo edit kobepaw/goop-veil --visibility public --accept-visibility-change-co
 - install issue?
 - false positive report?
 - router compatibility failure?
-- legal/compliance misunderstanding?
+- reporting/compliance misunderstanding?
 - media/social overstatement?
 
 ## Abort conditions

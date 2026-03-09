@@ -16,9 +16,9 @@ This release is a narrow public beta focused on the software stack:
 - cleaned internal-only release artifacts from the public repo surface
 
 ## What this release is not
-- not a legal advice product
+- not a determination product
 - not a compliance certification product
-- not a guarantee of detection accuracy, mitigation effectiveness, or legal admissibility
+- not a guarantee of detection accuracy, mitigation effectiveness, or admissibility
 - not a finished firmware release
 
 ## Known constraints
@@ -30,7 +30,7 @@ This release is a narrow public beta focused on the software stack:
 ## Recommended usage
 1. Start with scan/detect/evidence workflows
 2. Review mitigation guidance carefully before applying router changes
-3. Treat outputs as technical documentation artifacts, not legal conclusions
+3. Treat outputs as technical documentation artifacts, not official conclusions
 4. File issues with reproducible details when something breaks
 
 ## Call for feedback

@@ -19,7 +19,7 @@ We would rather be honest about firmware maturity than overclaim readiness.
 - conservative defaults
 - clear documentation of assumptions and limits
 - reproducible testing notes
-- no overclaiming around compliance or legal outcomes
+- no overclaiming around compliance or outcome claims
 
 ## Public posture
 If you contribute to firmware, assume your work will be reviewed under a stricter standard than experimental internal code. The public-facing project needs truthful scope boundaries and defensible safety claims.

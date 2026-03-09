@@ -30,7 +30,7 @@ Important caveat: this is a **research preview**.
 
 Detection is heuristic.
 Mitigation effectiveness varies.
-The project does **not** provide legal advice, compliance certification, or guaranteed outcomes.
+The project does **not** provide compliance certification or guaranteed outcomes.
 
 ## Post 6
 We also kept firmware out of the initial supported release surface.

@@ -25,7 +25,7 @@ Generate structured documentation artifacts for internal review, incident handli
 - Software-only research preview
 - Linux-first for scanning/capture workflows
 - Heuristic detection, not proof or attribution
-- Not legal advice or compliance certification
+- Not a determination engine or compliance certification
 - Firmware-related components currently experimental
 
 ## Who it’s for

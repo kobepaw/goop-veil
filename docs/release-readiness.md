@@ -13,7 +13,7 @@ This document provides a public-facing snapshot of release status and current co
 
 - Platform behavior may vary across WiFi chipsets/firmware and RF environments.
 - Mitigation effectiveness depends on deployment conditions and hardware capabilities.
-- Legal and regulatory material in this repository is informational only and not legal advice.
+- Reporting and regulatory material in this repository is informational only and not a formal determination.
 - No guarantee is made that generated evidence artifacts satisfy any specific court or agency requirement.
 
 ## Public Release Notes
