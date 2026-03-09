@@ -163,7 +163,7 @@ Last week, researchers at KIT demonstrated that WiFi beamforming data can identi
 - 30M+ homes already have routers with the hardware capability
 - No light turns on. No notification. No consent mechanism exists
 - The data is unencrypted beamforming feedback (BFI), readable by any device on or near the network
-- No federal law explicitly prohibits private WiFi CSI sensing
+- Policy, privacy, and enforcement frameworks have not kept pace with this capability
 - Kyllo v. US (2001) established that through-wall sensing is a Fourth Amendment violation, but only constrains government actors -- not your neighbor with an ESP32
 
 **What you can actually do about it:**
