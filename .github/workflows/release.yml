@@ -4,6 +4,7 @@ on:
   push:
     tags:
       - "v*"
+  workflow_dispatch:
 
 concurrency:
   group: release-${{ github.ref }}
@@ -128,7 +129,7 @@ jobs:
           files: dist/*.whl
 
       - name: Publish to PyPI
-        if: ${{ secrets.PYPI_TOKEN != '' }}
+        if: ${{ env.MATURIN_PYPI_TOKEN != '' }}
         uses: PyO3/maturin-action@v1
         with:
           command: upload
