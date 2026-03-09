@@ -1,0 +1,47 @@
+{
+  "version": "1.0.0",
+  "description": "Known WiFi sensing device signatures",
+  "signatures": [
+    {
+      "name": "RuView ESP32 Mesh",
+      "vendor": "Espressif",
+      "indicators": [
+        "espressif_oui",
+        "hidden_ssid",
+        "rapid_channel_hop",
+        "high_null_data_ratio"
+      ],
+      "typical_config": {
+        "devices": 3,
+        "channels": [1, 6, 11],
+        "beacon_interval_ms": 50
+      }
+    },
+    {
+      "name": "Generic ESP32 CSI Sensor",
+      "vendor": "Espressif",
+      "indicators": [
+        "espressif_oui",
+        "high_probe_ratio"
+      ],
+      "typical_config": {
+        "devices": 2,
+        "channels": [6],
+        "beacon_interval_ms": 100
+      }
+    },
+    {
+      "name": "802.11bf Sensing AP",
+      "vendor": "Various",
+      "indicators": [
+        "high_action_ratio",
+        "measurement_setup_action"
+      ],
+      "typical_config": {
+        "devices": 1,
+        "channels": [36, 40, 44, 48],
+        "beacon_interval_ms": 102
+      }
+    }
+  ]
+}

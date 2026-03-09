@@ -1,0 +1,20 @@
+{
+  "materials": {
+    "drywall": {"attenuation_per_m_24ghz": 2.5, "alias": ["gypsum", "plasterboard"]},
+    "wood": {"attenuation_per_m_24ghz": 3.5, "alias": ["plywood", "timber"]},
+    "glass": {"attenuation_per_m_24ghz": 2.0, "alias": ["window"]},
+    "brick": {"attenuation_per_m_24ghz": 5.0, "alias": []},
+    "concrete": {"attenuation_per_m_24ghz": 12.0, "alias": ["reinforced_concrete"]},
+    "concrete_block": {"attenuation_per_m_24ghz": 8.0, "alias": ["cinder_block"]},
+    "metal": {"attenuation_per_m_24ghz": 50.0, "alias": ["steel", "aluminum", "aluminium"]},
+    "metal_foil": {"attenuation_per_m_24ghz": 40.0, "alias": ["foil", "aluminum_foil"]},
+    "water": {"attenuation_per_m_24ghz": 15.0, "alias": []},
+    "fiberglass": {"attenuation_per_m_24ghz": 1.5, "alias": ["insulation"]},
+    "ceramic": {"attenuation_per_m_24ghz": 4.0, "alias": ["tile"]},
+    "marble": {"attenuation_per_m_24ghz": 6.0, "alias": ["stone"]},
+    "rf_absorber": {"attenuation_per_m_24ghz": 30.0, "alias": ["absorber"]},
+    "rf_reflector": {"attenuation_per_m_24ghz": 45.0, "alias": ["reflector"]}
+  },
+  "source": "ITU-R P.2040 and published measurement studies",
+  "reference_freq_mhz": 2437.0
+}

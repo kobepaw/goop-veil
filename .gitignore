@@ -1,0 +1,28 @@
+# Rust
+target/
+Cargo.lock
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+.venv/
+*.so
+*.whl
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# Data
+data/brorl_state.json
+data/signatures_local.json
+data/state/
+data/results/
+
+# OS
+.DS_Store
