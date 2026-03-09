@@ -26,3 +26,5 @@ data/results/
 
 # OS
 .DS_Store
+
+.venv-review/
