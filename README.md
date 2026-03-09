@@ -1,10 +1,10 @@
 # goop-veil
 
-WiFi privacy defense. Detect, mitigate, and document WiFi CSI surveillance.
+WiFi privacy defense research preview. Detect, mitigate, and document potential WiFi CSI surveillance signals.
 
 ![License](https://img.shields.io/badge/license-Apache--2.0-blue)
 ![Python](https://img.shields.io/badge/python-3.11%2B-blue)
-![Tests](https://img.shields.io/badge/tests-513%20passing-brightgreen)
+![Tests](https://img.shields.io/badge/tests-500%2B%20automated-brightgreen)
 
 ---
 
@@ -16,9 +16,9 @@ IEEE 802.11bf was ratified in September 2025. It standardized what researchers h
 - **$10 of ESP32 hardware** can detect your breathing from the next room.
 - **No consent required.** No light turns on. No notification. Nothing.
 - **No federal law** explicitly prohibits private WiFi CSI sensing.
-- **No defense product existed.** Until now.
+- **Defense tooling is still early.** This project is a research-preview option.
 
-goop-veil is the first open-source tool that detects WiFi sensing activity, applies software-only countermeasures through your existing router, and generates legal evidence packages for regulatory complaints.
+goop-veil is an open-source research preview that detects potential WiFi sensing activity, applies software-only countermeasures through your existing router, and generates evidence bundles for documentation workflows.
 
 ---
 
@@ -31,7 +31,9 @@ Scan your WiFi environment for sensing devices. Identifies Espressif mesh networ
 Software-only countermeasures applied through your existing router. No new hardware needed. Reconfigures channel, bandwidth, TX power, band steering, and PMF settings via router APIs (OpenWrt, UniFi, TP-Link). Orchestrates legitimate network traffic to degrade sensing accuracy.
 
 ### 3. Document
-Generates timestamped, HMAC-signed evidence packages for FCC complaints, cease-and-desist letters, and incident reports. The first WiFi CSI privacy case will be precedent-setting -- these documents position you for it.
+Generates timestamped, HMAC-signed evidence packages for incident documentation and legal/administrative review.
+
+goop-veil is software-only and currently positioned as a research preview. It is not legal advice, not a legal determination engine, and not a certification product.
 
 ---
 
@@ -50,7 +52,7 @@ goop-veil detect capture.pcap
 # Get mitigation recommendations
 goop-veil mitigate
 
-# Generate a legal evidence package
+# Generate an evidence package
 goop-veil evidence capture.pcap
 ```
 
@@ -73,7 +75,7 @@ Found 12 networks, 2 suspicious
 WARNING: 2 suspicious network(s) detected
 ```
 
-### `goop-veil detect --pcap capture.pcap`
+### `goop-veil detect capture.pcap`
 Deep analysis of captured WiFi traffic. Identifies sensing capabilities, mesh coordination, and CSI extraction patterns.
 
 ```
@@ -104,7 +106,7 @@ Estimated effectiveness: 78%
 ```
 
 ### `goop-veil evidence capture.pcap`
-Generate a legal evidence package with chain-of-custody documentation.
+Generate an evidence package with chain-of-custody documentation.
 
 ```
 $ goop-veil evidence capture.pcap --output-dir data/legal
@@ -172,13 +174,13 @@ System status and WiFi interface diagnostics.
 
 **BroRL adaptive defense** -- Thompson sampling selects and adapts countermeasure techniques based on observed effectiveness. Learns which combinations work against the specific sensing hardware detected in your environment.
 
-**FCC-compliant by design** -- All transmissions stay within Part 15.247 power limits. Every frame is tagged with a legitimate purpose. Signed audit logs prove compliance. The system never sends deauth/disassoc frames, never exceeds 20 dBm conducted power, and never addresses frames to third-party devices.
+**Compliance-oriented guardrails (not certification)** -- The software is designed to avoid deauth/disassoc traffic and to use conservative power-related defaults where supported by router APIs. Logs can aid review, but this project does not certify legal or regulatory compliance for any deployment.
 
 ---
 
 ## Measured Effectiveness
 
-All countermeasures are backed by peer-reviewed research.
+Countermeasures are informed by peer-reviewed research. Real-world outcomes vary by environment, hardware, and attacker setup.
 
 | Mitigation | Measured Effect | Source |
 |---|---|---|
@@ -192,16 +194,26 @@ All countermeasures are backed by peer-reviewed research.
 
 ---
 
-## Legal Landscape
+## Legal Landscape (General Information, Not Legal Advice)
 
 **No federal law directly prohibits private WiFi CSI sensing.** This is the gap.
 
 - **Kyllo v. US (2001)** established that through-wall sensing invades privacy, but only constrains government actors.
 - **47 USC 333** covers "radio communications" -- not passive sensing of signal physics.
-- **Illinois BIPA** provides $1K-$5K per violation with private right of action -- breathing and heartbeat data may qualify as biometric information.
-- **California CCPA/CPRA** covers "physiological or behavioral characteristics" -- CSI-derived data fits.
+- **Illinois BIPA** provides statutory damages with a private right of action; WiFi-derived breathing/heartbeat data may be argued to qualify in some scenarios.
+- **California CCPA/CPRA** references "physiological or behavioral characteristics"; whether specific CSI-derived inferences qualify is fact-dependent.
 
-**No court has ever ruled on WiFi CSI sensing.** The first case will set precedent. goop-veil generates the evidence packages needed to bring that case: timestamped detection logs, device fingerprints, signal analysis, and chain-of-custody documentation suitable for FCC complaints, civil suits, or law enforcement referrals.
+Legal outcomes are jurisdiction-specific and evolving. Use licensed counsel for legal analysis. goop-veil can generate timestamped logs and documentation artifacts that may help with internal records or attorney review.
+
+---
+
+## Known Limitations
+
+- Research preview: output quality and false-positive/false-negative rates can vary across environments.
+- Detection confidence is heuristic and should be treated as a lead, not a definitive attribution.
+- Mitigation effectiveness depends on router model/firmware, RF conditions, and attacker behavior.
+- Evidence bundles provide integrity-oriented logging, not courtroom admissibility guarantees.
+- The project provides technical tooling only and does not provide legal advice.
 
 ---
 
@@ -283,8 +295,8 @@ goop-veil/
     mcp/                  # MCP server (7 tools)
     hardware/             # WiFi HAL, ESP32 HAL
     integration/          # goop-net federation bridge
-  firmware/               # ESP32 firmware (FCC-compliant mesh AP)
-  tests/                  # 513 tests across 39 test files
+  firmware/               # ESP32 firmware
+  tests/                  # 500+ automated tests
 ```
 
 ---
@@ -295,4 +307,4 @@ goop-veil/
 
 ## Contributing
 
-Issues and PRs welcome. All contributions must pass the terminology compliance check -- see `compliance.py` for the approved vocabulary. This is a legal requirement, not a style preference.
+Issues and PRs welcome. Contributions should keep terminology and compliance-related phrasing accurate, cautious, and evidence-based.

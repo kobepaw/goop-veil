@@ -1,6 +1,16 @@
 # goop-veil Launch Materials
 
-All marketing materials for the public launch of goop-veil v0.1.0.
+Public-facing draft materials for goop-veil v0.1.0.
+
+Messaging guardrails for this file:
+- Frame goop-veil as a software-only research preview.
+- Avoid legal certainty, compliance certification, and guaranteed outcomes.
+- Avoid "first" and "100%" style claims.
+- Use "500+ automated tests" consistently.
+- Use current CLI syntax (`goop-veil detect <pcap>`, `goop-veil evidence <pcap>`).
+
+Required disclaimer copy (reuse in posts/interviews):
+"goop-veil is a software-only research preview. It provides technical signals and documentation artifacts, not legal advice, legal determinations, or compliance certification. Detection and mitigation results vary by environment."
 
 ---
 
@@ -8,13 +18,13 @@ All marketing materials for the public launch of goop-veil v0.1.0.
 
 **Tweet 1 (Hook):**
 
-Your WiFi router can identify you with ~100% accuracy through walls.
+Your WiFi router can identify you with high accuracy in lab conditions through walls.
 
 Not with a camera. With WiFi signals.
 
 30M+ homes already have the hardware. IEEE 802.11bf made it a standard last year.
 
-There is no defense product for this. Until today.
+Practical defense tooling is still early, and this project is one research-preview option.
 
 **Tweet 2 (Explain the threat):**
 
@@ -32,19 +42,19 @@ No camera. No microphone. No consent.
 
 Your WiFi router can see you breathe through walls.
 
-Not metaphorically. Researchers at KIT demonstrated ~100% identification accuracy using beamforming data that routers already collect.
+Not metaphorically. Researchers at KIT reported high identification accuracy in controlled lab conditions using beamforming data that routers already collect.
 
 This data is unencrypted. It is not covered by any federal privacy law.
 
 **Tweet 4 (Introduce goop-veil):**
 
-goop-veil is the first open-source defense against WiFi CSI surveillance.
+goop-veil is an open-source, software-only research preview for WiFi CSI surveillance defense.
 
 Pure software. No hardware to buy.
 
 pip install goop-veil
 
-Scans your environment, detects sensing devices, applies countermeasures through your existing router, and generates legal evidence packages.
+Scans your environment, detects sensing devices, applies countermeasures through your existing router, and generates signed documentation bundles.
 
 **Tweet 5 (What it does):**
 
@@ -52,7 +62,7 @@ Three steps:
 
 1. SCAN — finds sensing devices near you (no root needed)
 2. MITIGATE — reconfigures your router to degrade sensing accuracy (TX power variation alone causes 93% misclassification)
-3. DOCUMENT — generates HMAC-signed evidence for FCC complaints
+3. DOCUMENT — generates HMAC-signed documentation bundles for incident records and counsel review
 
 **Tweet 6 (Research backing):**
 
@@ -62,7 +72,7 @@ Every countermeasure backed by peer-reviewed research:
 - Wi-Spoof 2025: TX power variation = 93% misclassification
 - ITU-R P.2040: 5 GHz adds ~22 dB extra wall attenuation
 
-569 tests. Rust core. Apache-2.0.
+500+ automated tests. Rust core. Apache-2.0.
 
 #WiFiPrivacy
 
@@ -74,7 +84,7 @@ github.com/kobepaw/goop-veil
 
 pip install goop-veil[cli]
 
-The first WiFi CSI privacy case will set legal precedent. This tool generates the evidence to bring it.
+Not legal advice. The tool generates documentation artifacts that may assist legal review.
 
 Star it. Share it. Protect yourself.
 
@@ -96,17 +106,17 @@ Show HN: goop-veil -- Detect and counter WiFi CSI surveillance (open source)
 
 ### First Comment (~200 words)
 
-Hey HN -- I built goop-veil because the WiFi CSI surveillance problem has no existing defense tool.
+Hey HN -- I built goop-veil because practical WiFi CSI defense tooling is still limited.
 
-The threat: 802.11bf was ratified September 2025, standardizing WiFi sensing. Researchers at KIT demonstrated near-perfect human identification through walls using beamforming feedback. UChicago showed that $10 of ESP32 hardware can detect breathing and heartbeat from adjacent rooms. 30M+ homes already have routers with the hardware capability.
+The threat: 802.11bf was ratified in September 2025, standardizing WiFi sensing. Researchers at KIT reported high human-identification performance in lab settings using beamforming feedback. UChicago showed low-cost ESP32 setups can infer breathing and heartbeat from adjacent rooms. Many homes already have compatible hardware.
 
 What goop-veil does:
 
 - **Detection**: Scans for Espressif sensing meshes, suspicious traffic patterns, CSI extraction signatures. No root for basic scans.
 - **Mitigation**: Reconfigures your router (OpenWrt, UniFi, TP-Link) to degrade sensing accuracy. TX power variation alone causes 93% misclassification (Wi-Spoof, JISA 2025). Cover traffic drops detection accuracy to 47% (UChicago, NDSS 2020). Band steering to 5 GHz adds ~22 dB additional wall attenuation.
-- **Legal evidence**: HMAC-signed detection logs, device fingerprints, and chain-of-custody documentation for FCC complaints. No court has ruled on WiFi CSI yet -- the first case will set precedent.
+- **Evidence artifacts**: HMAC-signed detection logs, device fingerprints, and chain-of-custody documentation for incident records and legal counsel review.
 
-Architecture: Rust core (802.11 frame parsing, FFT, Fresnel zone physics) for performance, Python for usability. 569 tests. FCC Part 15 compliant by design -- never sends deauth/disassoc frames, never exceeds 20 dBm conducted power. Apache-2.0 license.
+Architecture: Rust core (802.11 frame parsing, FFT, Fresnel zone physics) for performance, Python for usability. 500+ automated tests. Includes compliance-oriented guardrails, but is not a compliance certification tool. Apache-2.0 license.
 
 Install: `pip install goop-veil[cli]`
 
@@ -115,7 +125,8 @@ Happy to answer questions about the signal physics, legal landscape, or counterm
 ### Key Points to Address for HN Commenters
 
 **"Is this legal?"**
-Yes. All countermeasures use legitimate network traffic and standard router configuration changes (channel, TX power, bandwidth, PMF). The system never sends deauth/disassoc frames, never exceeds FCC Part 15.247 power limits (20 dBm conducted), and never addresses frames to third-party devices. Every transmission is tagged with a legitimate purpose and audit-logged. The compliance module (`compliance.py`) enforces terminology and power limits at the code level.
+The software is technical tooling, not legal advice. It uses ordinary router configuration changes and includes guardrails intended to reduce risky behavior, but users should validate obligations with qualified counsel.
+
 
 **"Does this actually work?"**
 Every mitigation is backed by peer-reviewed research with measured effectiveness. Co-channel traffic: detection drops to 47% (UChicago "Et Tu Alexa," NDSS 2020). TX power variation: 93% misclassification (Wi-Spoof, JISA 2025). Band steering to 5 GHz: ~45 dB wall attenuation vs ~23 dB at 2.4 GHz (ITU-R P.2040). Bandwidth widening (80/160 MHz): invalidates trained sensing models. The mitigation implementation plan cites all sources.
@@ -145,7 +156,7 @@ PHY-layer defenses like CSI randomization (MIMOCrypt) or CSI fuzzing require con
 
 **Body:**
 
-Last week, researchers at KIT demonstrated that WiFi beamforming data can identify individuals through walls with near-perfect accuracy. This isn't new science -- University of Chicago showed in 2020 that $10 of ESP32 hardware could detect breathing and heartbeat from adjacent rooms -- but 802.11bf, ratified in September 2025, just made WiFi sensing a standard feature of the protocol.
+Last week, researchers at KIT demonstrated that WiFi beamforming data can identify individuals through walls with high lab performance. This isn't new science -- University of Chicago showed in 2020 that low-cost ESP32 hardware could detect breathing and heartbeat from adjacent rooms -- but 802.11bf, ratified in September 2025, made WiFi sensing a standard feature of the protocol.
 
 **The scale of the problem:**
 
@@ -163,9 +174,9 @@ I released goop-veil, an open-source tool (Apache-2.0) that does three things:
 
 2. **Mitigates** through your existing router. Software-only countermeasures that degrade sensing accuracy: TX power variation (93% misclassification rate per Wi-Spoof 2025), cover traffic generation (drops detection to 47% per UChicago NDSS 2020), band steering to 5 GHz (doubles wall attenuation), and more.
 
-3. **Documents** everything for legal action. Generates HMAC-signed evidence packages with device fingerprints, timestamps, and chain-of-custody documentation suitable for FCC complaints, BIPA claims (Illinois: $1K-$5K per violation with private right of action), or CCPA/CPRA complaints in California.
+3. **Documents** incident telemetry. Generates HMAC-signed evidence bundles with device fingerprints, timestamps, and chain-of-custody documentation for records and counsel review.
 
-No court has ever ruled on WiFi CSI sensing by private parties. The first case will set precedent. This tool generates the evidence you need.
+This is not legal advice. WiFi CSI legal questions are evolving and jurisdiction-specific.
 
 **How to get it:**
 
@@ -176,7 +187,7 @@ goop-veil scan
 
 Source: https://github.com/kobepaw/goop-veil
 
-Pure software, zero hardware purchases, 569 tests, Rust core for performance. Supports OpenWrt, UniFi, and TP-Link routers. Linux is currently required for WiFi scanning/capture commands.
+Pure software, zero hardware purchases, 500+ automated tests, Rust core for performance. Supports OpenWrt, UniFi, and TP-Link routers. Linux is currently required for WiFi scanning/capture commands.
 
 The strongest legal tools right now are Illinois BIPA (biometric data) and California CCPA/CPRA (physiological characteristics). If WiFi-derived breathing and heartbeat data qualifies as biometric information -- and there are strong arguments that it does -- then unauthorized collection could carry significant statutory damages.
 
@@ -184,7 +195,7 @@ The strongest legal tools right now are Illinois BIPA (biometric data) and Calif
 
 ### r/netsec Post
 
-**Title:** goop-veil: Open-source WiFi CSI surveillance detection and countermeasures (Rust + Python, 569 tests)
+**Title:** goop-veil: Open-source WiFi CSI surveillance detection and countermeasures (Rust + Python, 500+ automated tests)
 
 **Body:**
 
@@ -200,7 +211,7 @@ An attacker deploys 2-3 ESP32 devices (~$5 each) forming a sensing mesh. They ca
 - **Python detection engine**: Beacon scanner (Espressif OUI, suspicious SSID patterns, mesh topology), traffic analyzer (channel hopping detection, null data ratios, action frame analysis), CSI signature matching, alert engine with confidence scoring
 - **Router adapters**: OpenWrt (SSH+UCI), UniFi (HTTPS REST), TP-Link (HTTPS token auth). ABC-based, easy to extend
 - **Countermeasures**: Ranked by measured effectiveness with auto-apply capability
-- **Legal evidence**: HMAC-signed logs, timestamped device fingerprints, chain-of-custody documentation
+- **Evidence artifacts**: HMAC-signed logs, timestamped device fingerprints, chain-of-custody documentation
 
 **Measured countermeasure effectiveness:**
 
@@ -217,11 +228,11 @@ An attacker deploys 2-3 ESP32 devices (~$5 each) forming a sensing mesh. They ca
 
 PHY-layer CSI randomization (MIMOCrypt, AntiSense) requires controlling the transmitter. CSI fuzzing (openwifi FPGA) was shown to be bypassable with few-shot learning (SnoopFi, Computer Networks 2025). Software-only countermeasures focus on degrading the attacker's SNR and breaking temporal coherence, not injecting fake CSI.
 
-**FCC compliance:**
+**Compliance framing:**
 
-All transmissions stay within Part 15.247 limits. Never sends deauth frames, never exceeds 20 dBm conducted, never addresses frames to third-party devices. Signed audit logs prove compliance. The compliance module enforces this at the code level with prohibited terminology checks and hardware PA cutoffs.
+Use guardrail language, not certification language. Example: "The software is designed with conservative operational constraints (including avoiding deauth/disassoc behavior) and audit logging, but does not certify legal or regulatory compliance."
 
-569 tests (Python + Rust), Apache-2.0. Linux support for WiFi scanning/capture.
+500+ automated tests (Python + Rust), Apache-2.0. Linux support for WiFi scanning/capture.
 
 ```
 pip install goop-veil[cli]
@@ -245,7 +256,7 @@ Interested in contributions on additional router adapters (ASUS Merlin especiall
 
 I've been down a rabbit hole on WiFi CSI (Channel State Information) surveillance for the past few months. The short version: ordinary WiFi signals bouncing off your body carry enough information to detect your presence, movement, breathing, and heartbeat through walls. IEEE 802.11bf standardized this in September 2025. 30M+ homes already have routers with the hardware to do it.
 
-I built goop-veil because no defense tool existed.
+I built goop-veil because practical defenses are still limited and underexplored.
 
 **What it does on your home network:**
 
@@ -263,7 +274,7 @@ I built goop-veil because no defense tool existed.
 
 4. `goop-veil assess --room 4.5x3.5x2.7 --budget 200` -- room vulnerability assessment with material recommendations and cost estimates (RF shielding film, metallic curtains, etc.).
 
-5. `goop-veil evidence capture.pcap` -- generates HMAC-signed legal evidence packages if you need to file complaints.
+5. `goop-veil evidence capture.pcap` -- generates HMAC-signed documentation bundles if you need incident records.
 
 **Technical details for the self-hosted crowd:**
 
@@ -273,7 +284,7 @@ I built goop-veil because no defense tool existed.
 - Router credentials passed via environment variable only (`VEIL_ROUTER_PASSWORD`), never stored in config files
 - MCP server mode available for integration with AI assistants
 - Web dashboard optional (`pip install goop-veil[dashboard]`)
-- 569 tests, Apache-2.0 license
+- 500+ automated tests, Apache-2.0 license
 
 **For OpenWrt users:** You get the best experience. Full UCI/ubus control means goop-veil can adjust channel, TX power, bandwidth, beacon interval, PMF, and RTS threshold. Dry-run mode is the default -- it shows you what it would change before touching anything.
 
@@ -308,7 +319,7 @@ Researchers have known about this capability for years. What changed is that it 
 
 There are 30 million homes in the United States alone that already have routers with the hardware to perform WiFi sensing. There is no notification when it happens. There is no consent mechanism. And there is no law that explicitly prohibits it.
 
-Until today, there was also no defense tool. goop-veil changes that.
+Tools in this area are still early. goop-veil is a research-preview option.
 
 ## What WiFi Sensing Can Actually Detect
 
@@ -322,7 +333,7 @@ Modern WiFi hardware reports these signal characteristics as Channel State Infor
 
 The research results are sobering:
 
-- **KIT (Karlsruhe Institute of Technology)**: Demonstrated near-perfect identification of individuals through walls using beamforming feedback data that routers already broadcast in plaintext. [LeakyBeam, NDSS 2025]
+- **KIT (Karlsruhe Institute of Technology)**: Demonstrated high identification performance in lab settings through walls using beamforming feedback data that routers already broadcast in plaintext. [LeakyBeam, NDSS 2025]
 - **University of Chicago**: Showed that $10 of ESP32 hardware can detect breathing and heartbeat from adjacent rooms. Proposed cover traffic as a countermeasure. ["Et Tu Alexa," NDSS 2020]
 - **Wi-Spoof**: Demonstrated that even small variations in transmit power cause 93% misclassification in WiFi sensing systems. [JISA 2025]
 
@@ -343,11 +354,11 @@ The strongest existing tools are at the state level:
 - **Illinois BIPA (740 ILCS 14)**: Protects biometric information with a private right of action and statutory damages of $1,000-$5,000 per violation. If WiFi-derived breathing patterns and heartbeat signatures qualify as "biometric identifiers" or "biometric information" -- and there are strong arguments that they do -- then unauthorized collection would be actionable.
 - **California CCPA/CPRA**: Covers collection of data derived from "physiological or behavioral characteristics." CSI-derived presence, movement, and vital signs data fits squarely within this language.
 
-No court has ever ruled on WiFi CSI sensing. The first case will set precedent that shapes the regulatory landscape for years. The evidence needed to bring that case -- timestamped detection logs, device fingerprints, signal analysis, chain-of-custody documentation -- needs to exist before the case can be filed.
+Legal interpretation of WiFi CSI sensing is still evolving. Documentation quality matters, but legal strategy should come from licensed counsel.
 
 ## Introducing goop-veil
 
-goop-veil is the first open-source tool for detecting WiFi sensing activity, applying software-only countermeasures through your existing router, and generating legal evidence packages. It is available today under the Apache-2.0 license.
+goop-veil is an open-source research preview tool for detecting WiFi sensing activity, applying software-only countermeasures through your existing router, and generating signed documentation bundles. It is available today under the Apache-2.0 license.
 
 It is pure software. There is nothing to buy. You install it with pip and run it on a Linux machine with a WiFi adapter.
 
@@ -398,9 +409,9 @@ These countermeasures are applied through your router's native API. goop-veil su
 goop-veil mitigate --router-host 192.168.1.1 --router-type openwrt
 ```
 
-### Legal Evidence
+### Evidence Bundles
 
-goop-veil generates HMAC-signed evidence packages suitable for FCC complaints, cease-and-desist letters, civil lawsuits under BIPA or CCPA, and law enforcement referrals.
+goop-veil generates HMAC-signed evidence bundles for incident records and legal counsel review.
 
 Each evidence package includes timestamped detection logs, device fingerprints with OUI attribution, signal analysis with Fresnel zone calculations, a timeline of sensing activity, and chain-of-custody documentation. Reports are hash-signed for integrity verification.
 
@@ -414,9 +425,9 @@ Under the hood, goop-veil combines a high-performance Rust core with a Python de
 
 The Rust core handles 802.11 frame parsing at over one million frames per second. It classifies management frames (beacons, probe requests, action frames), extracts CSI-relevant metadata, performs FFT spectral analysis to identify periodic signals in the breathing (0.15-0.5 Hz) and heartbeat (0.8-2.0 Hz) bands, calculates Fresnel zone geometry for given room configurations, models signal propagation and material attenuation using ITU-R P.2040 parameters, and maintains a 250,000+ entry OUI database for vendor identification.
 
-The Python layer implements the detection engine (beacon scanning, traffic analysis, CSI signature matching, alert generation), router adapters for mitigation, traffic orchestration, the legal evidence pipeline, and the CLI. An adaptive defense system uses Thompson sampling to select and tune countermeasure combinations based on observed effectiveness in your specific environment.
+The Python layer implements the detection engine (beacon scanning, traffic analysis, CSI signature matching, alert generation), router adapters for mitigation, traffic orchestration, the evidence pipeline, and the CLI. An adaptive defense system uses Thompson sampling to select and tune countermeasure combinations based on observed effectiveness in your specific environment.
 
-Every transmission generated by goop-veil stays within FCC Part 15.247 power limits. Every frame is tagged with a legitimate purpose. Signed audit logs prove compliance. The system never sends deauth/disassoc frames, never exceeds 20 dBm conducted power, and never addresses frames to third-party devices. This is enforced at the code level through a compliance module that prohibits specific terminology and caps power output with hardware-level cutoffs.
+goop-veil includes compliance-oriented operational constraints (for example, avoiding deauth/disassoc behavior and logging actions for review). It does not certify legal or regulatory compliance for a specific deployment.
 
 ## Getting Started
 
@@ -457,7 +468,7 @@ Assess your room's physical vulnerability:
 goop-veil assess --room 4.5x3.5x2.7 --budget 200
 ```
 
-Generate a legal evidence package:
+Generate an evidence bundle:
 
 ```bash
 goop-veil evidence scan.pcap --output-dir data/legal
@@ -467,7 +478,7 @@ goop-veil also runs as an MCP server for integration with AI assistants, and off
 
 ## What Comes Next
 
-The legal landscape will change. 802.11bf moves WiFi sensing from a research curiosity to a standardized protocol feature. As sensing-capable routers proliferate, the regulatory pressure will build. The question is not whether lawmakers will address this -- it is whether they will act before or after widespread deployment.
+The legal landscape is evolving. 802.11bf moves WiFi sensing from a research curiosity to a standardized protocol feature. As sensing-capable routers proliferate, regulatory and litigation activity may increase.
 
 Several developments are worth watching:
 
@@ -492,7 +503,7 @@ License: Apache-2.0
 
 I want to share an open-source tool I built to address a privacy gap that does not have an existing solution: WiFi Channel State Information (CSI) surveillance.
 
-**The threat in brief:** WiFi signals reflect off human bodies in ways that encode presence, movement, breathing rate, and heartbeat. This has been demonstrated repeatedly in peer-reviewed research (UChicago NDSS 2020, Wi-Spoof JISA 2025, LeakyBeam NDSS 2025, KIT beamforming identification). IEEE 802.11bf, ratified September 2025, standardizes WiFi sensing as a protocol feature. 30M+ US homes already have routers with the hardware capability. No federal law explicitly prohibits private WiFi CSI sensing, and no commercial or open-source defense tool existed before this one.
+**The threat in brief:** WiFi signals reflect off human bodies in ways that can encode presence, movement, breathing rate, and heartbeat. This has been demonstrated repeatedly in peer-reviewed research (UChicago NDSS 2020, Wi-Spoof JISA 2025, LeakyBeam NDSS 2025, KIT beamforming identification). IEEE 802.11bf, ratified September 2025, standardizes WiFi sensing as a protocol feature. Many US homes already have compatible hardware. Federal and state treatment of private WiFi CSI sensing remains unsettled.
 
 **What goop-veil does:**
 
@@ -500,16 +511,16 @@ I want to share an open-source tool I built to address a privacy gap that does n
 
 2. **Software-only countermeasures** -- reconfigures your existing router via its native API (OpenWrt, UniFi, TP-Link supported). All countermeasures are documented with peer-reviewed sources and measured effectiveness values. Key mitigations: TX power variation (93% misclassification, Wi-Spoof 2025), co-channel traffic generation (detection drops to 47%, UChicago 2020), band steering to 5 GHz (~22 dB additional wall attenuation, ITU-R P.2040), bandwidth widening, beamforming disable, PMF enable.
 
-3. **Legal evidence generation** -- HMAC-signed evidence packages with device fingerprints, timestamped detection logs, and chain-of-custody documentation for FCC complaints or state-level privacy claims (BIPA, CCPA/CPRA).
+3. **Evidence generation** -- HMAC-signed evidence packages with device fingerprints, timestamped detection logs, and chain-of-custody documentation for records and counsel review.
 
 **Technical details:**
 
 - Python 3.11+ with Rust native extension for 802.11 frame parsing and signal processing
-- 569 tests (Python + Rust)
+- 500+ automated tests (Python + Rust)
 - No cloud services, no telemetry, no accounts. All data stays local
 - Router credentials via environment variable only, never stored in config
 - Apache-2.0 license
-- FCC Part 15.247 compliant -- never sends deauth/disassoc frames, max 20 dBm conducted, audit-logged
+- Compliance-oriented guardrails (not certification) with audit logging
 
 **What it does NOT do:**
 
@@ -536,11 +547,11 @@ I built this because the 802.11bf ratification closed the last remaining argumen
 
 ### goop-veil v0.1.0
 
-The first public release of goop-veil -- WiFi privacy defense.
+Public research-preview release of goop-veil.
 
 **What's in this release:**
 
-Detection, mitigation, and legal evidence generation for WiFi CSI (Channel State Information) surveillance. Pure software, zero hardware purchases.
+Detection, mitigation, and signed documentation generation for WiFi CSI (Channel State Information) surveillance. Pure software, zero hardware purchases.
 
 **Key Capabilities:**
 
@@ -549,7 +560,7 @@ Detection, mitigation, and legal evidence generation for WiFi CSI (Channel State
 - **Router countermeasures** -- software-only mitigations applied through your existing router's API. Supports OpenWrt (SSH+UCI), UniFi (HTTPS REST), and TP-Link (HTTPS). TX power variation, band steering, channel hopping, bandwidth widening, beamforming disable, PMF enable, beacon interval adjustment
 - **Traffic orchestration** -- legitimate co-channel traffic generation to degrade sensing accuracy
 - **Room vulnerability assessment** -- physical material recommendations with cost estimates
-- **Legal evidence packages** -- HMAC-signed detection logs, device fingerprints, and chain-of-custody documentation for FCC complaints and privacy claims
+- **Evidence bundles** -- HMAC-signed detection logs, device fingerprints, and chain-of-custody documentation for incident records and counsel review
 - **Continuous monitoring** -- background scanning with configurable alerts
 - **MCP server** -- 7 tools for AI assistant integration
 - **Web dashboard** -- optional FastAPI-based monitoring UI
@@ -558,9 +569,9 @@ Detection, mitigation, and legal evidence generation for WiFi CSI (Channel State
 **Architecture:**
 
 - Rust core: 802.11 frame parsing (>1M frames/sec), FFT spectral analysis, Fresnel zone physics, OUI database (250K+ entries), material attenuation modeling
-- Python: detection engine, router adapters, traffic orchestration, legal pipeline, CLI, MCP server
-- 569 tests (Python + Rust)
-- FCC Part 15.247 compliant by design
+- Python: detection engine, router adapters, traffic orchestration, evidence pipeline, CLI, MCP server
+- 500+ automated tests (Python + Rust)
+- Compliance-oriented constraints by design (not certification)
 
 **Installation:**
 
@@ -581,6 +592,8 @@ pip install git+https://github.com/kobepaw/goop-veil.git#egg=goop-veil[cli]
 - Monitor mode capture (`goop-veil capture`) requires root/sudo
 - ESP32 active countermeasure hardware control requires `[active]` extras and serial connection
 - No Windows support in this release
+- Detection and mitigation performance varies by RF environment and adversary behavior
+- Evidence bundles are technical records, not legal advice or admissibility guarantees
 
 **Research Citations:**
 
@@ -604,7 +617,7 @@ pip install git+https://github.com/kobepaw/goop-veil.git#egg=goop-veil[cli]
 Detect, counter, and document WiFi CSI surveillance. Software-only defense against through-wall sensing. Rust core, Python CLI.
 
 **PyPI package description:**
-WiFi privacy defense -- detect sensing devices, apply router countermeasures, generate legal evidence packages.
+WiFi privacy defense -- detect sensing devices, apply router countermeasures, generate signed documentation bundles.
 
 **Twitter bio addition:**
 Creator of goop-veil -- open-source defense against WiFi through-wall surveillance
@@ -613,4 +626,4 @@ Creator of goop-veil -- open-source defense against WiFi through-wall surveillan
 Open-source WiFi CSI surveillance detection and software-only countermeasures (Rust + Python)
 
 **Blog post meta description:**
-802.11bf standardized WiFi sensing, letting routers detect breathing and heartbeat through walls. goop-veil is the first open-source tool to detect, counter, and document this surveillance.
+802.11bf standardized WiFi sensing, letting routers detect breathing and heartbeat through walls. goop-veil is an open-source research preview tool to detect, counter, and document this surveillance.
