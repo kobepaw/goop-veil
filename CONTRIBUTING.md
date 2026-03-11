@@ -75,11 +75,19 @@ If you contribute there, include:
 Please use issue templates when available.
 
 High-signal reports usually include:
-- OS / Python version
-- router type / firmware version
-- command run
-- expected vs actual behavior
-- redacted logs or pcap details when relevant
+- OS / Python version and adapter/router/firmware details
+- exact command(s) run and capture duration
+- expected vs actual behavior in cautious, non-attribution language
+- enough reproduction detail for a maintainer to follow the same path
+- redacted logs or pcap-derived excerpts (or safe metadata when raw artifacts should not be shared)
+
+For false-positive / false-negative reports specifically:
+- use the dedicated issue template
+- include the observed output snippet and why it may be incorrect
+- include reproducibility notes so maintainers can route to parser, thresholding, environment, or docs follow-up work
+- redact sensitive fields (for example SSIDs, BSSIDs/MACs, IPs, hostnames, account IDs, addresses, or personal identifiers) before posting
+
+See [docs/DETECTION_QUALITY_REPORTING.md](./docs/DETECTION_QUALITY_REPORTING.md) for contributor-facing guidance and privacy-safe evidence examples.
 
 ## Community expectations
 Be direct, respectful, and evidence-oriented.

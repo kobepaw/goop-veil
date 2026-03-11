@@ -1,30 +1,86 @@
 name: False positive / false negative report
-description: Report questionable detection output
+description: Report potentially incorrect detection output with reproducible, privacy-safe details
 labels: ["false-positive", "type:research"]
 body:
   - type: dropdown
     id: kind
     attributes:
-      label: Type
+      label: Report type
       options:
-        - False positive
-        - False negative
+        - False positive (flagged as suspicious, but likely benign)
+        - False negative (likely suspicious activity, but not flagged)
     validations:
       required: true
+
   - type: textarea
     id: summary
     attributes:
       label: Summary
-      description: What did goop-veil report, and what do you believe is wrong?
+      description: Short, cautious description of what goop-veil reported and why it may be inaccurate.
+      placeholder: "Example: Detection flagged sensing during known benign traffic test on OpenWrt 23.05."
     validations:
       required: true
+
   - type: textarea
-    id: evidence
+    id: observed
     attributes:
-      label: Supporting details
-      description: Relevant redacted logs, pcap details, environment, or reasoning
+      label: Observed output
+      description: Paste the relevant CLI output (redacted as needed), confidence values, or report excerpt.
+      placeholder: "Command output snippet, timestamps, and any relevant score/confidence fields."
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Why this may be incorrect
+      description: Explain what you expected and what independent context supports that expectation.
+      placeholder: "Known test setup, controlled traffic, router config, or prior baseline behavior."
+    validations:
+      required: true
+
+  - type: dropdown
+    id: reproducible
+    attributes:
+      label: Can maintainers likely reproduce this?
+      options:
+        - Yes (steps below are likely sufficient)
+        - Partially (some details may be missing)
+        - Not yet sure
+    validations:
+      required: true
+
+  - type: textarea
+    id: repro_steps
+    attributes:
+      label: Reproduction steps
+      description: Provide exact commands/sequence, capture duration, and when in the run the questionable output appears.
+      placeholder: |
+        1) goop-veil capture --duration 60 --output scan.pcap
+        2) goop-veil detect scan.pcap
+        3) Questionable result appears at ...
+    validations:
+      required: true
+
   - type: input
     id: environment
     attributes:
       label: Environment
-      description: OS, adapter, router, firmware, capture method
+      description: OS, Python version, adapter/chipset, router model, firmware version.
+
+  - type: textarea
+    id: artifacts
+    attributes:
+      label: Logs / pcap details (redacted)
+      description: |
+        Share only what is necessary for debugging. Redact or remove sensitive data before posting.
+        At minimum, redact: SSIDs, BSSIDs/MACs, internal/public IPs, account IDs, hostnames, addresses, and personal identifiers.
+        If you cannot safely share raw artifacts, provide sanitized excerpts and metadata instead.
+      placeholder: "Redacted log lines, packet/time-window metadata, and hash/checksum if relevant."
+
+  - type: textarea
+    id: routing
+    attributes:
+      label: Suggested follow-up scope
+      description: Help route this issue by selecting the most likely area.
+      placeholder: "Parser/feature extraction, thresholding/classification, environment/noise handling, docs/expectation mismatch, or unsure."

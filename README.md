@@ -239,7 +239,7 @@ Reporting and regulatory outcomes are jurisdiction-specific and evolving. goop-v
 
 If you want to help in week one, start with [CONTRIBUTING.md](./CONTRIBUTING.md).
 
-- Contributors: use the issue templates, then look for `good-first-issue`, docs, detection-quality, or router compatibility work.
+- Contributors: use the issue templates, then look for `good-first-issue`, docs, detection-quality, or router compatibility work. For detection-quality reports, use [docs/DETECTION_QUALITY_REPORTING.md](./docs/DETECTION_QUALITY_REPORTING.md).
 - Maintainers: use [docs/COMMUNITY_LABELS.md](./docs/COMMUNITY_LABELS.md) for label setup and [docs/STARTER_ISSUE_BATCH_WEEK_ONE.md](./docs/STARTER_ISSUE_BATCH_WEEK_ONE.md) to seed the first public issue batch.
 
 ---
