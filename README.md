@@ -252,8 +252,8 @@ See the full compatibility notes in [docs/ROUTER_COMPATIBILITY.md](./docs/ROUTER
 |---|---|---|---|
 | OpenWrt | Supported | UCI / ubus JSON-RPC | Strongest current support surface |
 | UniFi | Supported | REST API | Good support, controller/device variation applies |
-| TP-Link | Partial | HTTPS token auth | Model-dependent; insecure HTTP is opt-in only |
-| ASUS Merlin | Planned | SSH + `wl` CLI | Investigation work still needed |
+| TP-Link | Experimental | HTTPS token auth | Selected model paths; model-dependent, insecure HTTP is opt-in only |
+| ASUS Merlin | Unverified | SSH + `wl` CLI (target path) | Investigation work still needed before any support claim |
 
 Router credentials are passed via the `VEIL_ROUTER_PASSWORD` environment variable. Never stored in config files.
 
