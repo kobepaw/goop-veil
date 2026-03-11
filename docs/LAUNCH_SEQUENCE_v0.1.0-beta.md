@@ -1,7 +1,7 @@
 # Launch Sequence — goop-veil v0.1.0-beta
 
 ## Status
-- Repo: private
+- Repo: public
 - Prerelease tag: `v0.1.0-beta`
 - Prerelease page exists on GitHub
 - Public launch copy drafted in `docs/`

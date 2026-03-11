@@ -1,12 +1,25 @@
 # goop-veil
 
-Your WiFi can be used to sense you through walls. goop-veil is a software-only WiFi privacy defense that detects, degrades, and documents potential CSI surveillance using your existing router.
+Your WiFi can be used to sense you through walls. goop-veil is a software-only WiFi privacy defense that helps **detect, degrade, and document** potential CSI surveillance using supported routers.
 
 **Research preview. Linux-first for WiFi scanning/capture. Supported router families today: OpenWrt, UniFi, and selected TP-Link paths.**
 
 ![License](https://img.shields.io/badge/license-Apache--2.0-blue)
 ![Python](https://img.shields.io/badge/python-3.11%2B-blue)
 ![Tests](https://img.shields.io/badge/tests-500%2B%20automated-brightgreen)
+
+## Start here
+
+```bash
+pip install 'git+https://github.com/kobepaw/goop-veil.git#egg=goop-veil[cli]'
+goop-veil scan
+```
+
+- New here? Read [FAQ](./docs/FAQ.md)
+- Evaluating support? Read [ROUTER_COMPATIBILITY.md](./docs/ROUTER_COMPATIBILITY.md)
+- Want the limits first? Read [KNOWN_LIMITATIONS.md](./docs/KNOWN_LIMITATIONS.md)
+
+> goop-veil is a **software-only research preview**. It provides technical signals and documentation artifacts, not determinations, proof, or compliance certification. Detection and mitigation results vary by environment.
 
 ---
 
