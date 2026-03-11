@@ -77,6 +77,8 @@ If you are evaluating router support first, see [docs/ROUTER_COMPATIBILITY.md](.
 
 ## CLI Commands
 
+> Example outputs below are representative CLI snapshots (sample/simulated environments). Exact counts, threat levels, and recommendations vary by capture quality, RF conditions, and router capabilities.
+
 ### `goop-veil scan`
 Scan nearby WiFi networks for sensing hardware. No root required. Flags Espressif OUIs, suspicious SSIDs, and hidden networks.
 
@@ -104,22 +106,20 @@ Summary: Espressif mesh with CSI extraction detected on channel 6
 ```
 
 ### `goop-veil mitigate`
-Ranked countermeasure recommendations. Optionally auto-applies safe router changes.
+Ranked countermeasure recommendations. Optional router changes are only applied when explicitly requested with `--auto-apply` plus router connection details.
 
 ```
-$ goop-veil mitigate --router-host 192.168.1.1 --router-type openwrt
+$ goop-veil mitigate --pcap capture.pcap
 Mitigation Recommendations
-Threat level: HIGH
-Estimated effectiveness: 78%
+Threat level: MEDIUM
+Estimated effectiveness: 80%
 
-  #  Mitigation                Effectiveness  Difficulty  Auto  WiFi Impact
-  1  Co-channel traffic gen    53%            Easy        Y     Minimal
-  2  TX power variation        93%            Easy        Y     None
-  3  Band steering to 5 GHz   45 dB gain     Easy        Y     Minor
-  4  Channel hopping           High           Easy        Y     Brief drops
-  5  Bandwidth widening        High           Easy        Y     None
-  6  PMF (802.11w) enable      Medium         Easy        Y     None
-  7  Beacon interval increase  Medium         Easy        Y     None
+  #  Mitigation                         Effectiveness  Difficulty  Auto  WiFi Impact
+  1  Migrate to 5 GHz band              85%            easy              brief_drop
+  2  Enable TX power variation          80%            moderate          none
+  3  Switch to channel 11               75%            easy              brief_drop
+  4  Widen bandwidth to 80 MHz          65%            easy              brief_drop
+  5  Enable 802.11w PMF (required)      40%            easy              none
 ```
 
 ### `goop-veil evidence capture.pcap`
@@ -144,6 +144,7 @@ Captured to scan.pcap (2,847,392 bytes)
 Restored managed mode.
 
 Running detection analysis...
+# (detection report output omitted for brevity)
 ```
 
 ### `goop-veil monitor`
