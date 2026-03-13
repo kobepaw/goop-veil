@@ -7,6 +7,7 @@ from __future__ import annotations
 
 from datetime import datetime
 from enum import StrEnum
+from typing import Any
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -89,9 +90,9 @@ class EvidencePackage(BaseModel):
     model_config = ConfigDict(frozen=True, extra="forbid")
 
     timestamp: datetime = Field(default_factory=datetime.now)
-    detection_results: list[dict] = Field(default_factory=list)
-    device_fingerprints: list[dict] = Field(default_factory=list)
-    timeline: list[dict] = Field(default_factory=list)
+    detection_results: list[dict[str, Any]] = Field(default_factory=list)
+    device_fingerprints: list[dict[str, Any]] = Field(default_factory=list)
+    timeline: list[dict[str, Any]] = Field(default_factory=list)
     output_path: str = ""
     report_hash: str = ""
     disclaimer: str = (

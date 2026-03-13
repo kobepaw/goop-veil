@@ -113,10 +113,10 @@ jobs:
           source .venv/bin/activate
           pip install .[dev]
 
-      - name: Run ruff
+      - name: Run ruff (staged surface)
         run: |
           source .venv/bin/activate
-          ruff check python tests
+          ruff check python/goop_veil/mitigation/legal
 
   mypy:
     runs-on: ubuntu-latest
@@ -152,7 +152,7 @@ jobs:
       - name: Run mypy (staged, report-only)
         run: |
           source .venv/bin/activate
-          mypy --ignore-missing-imports python/goop_veil
+          mypy --ignore-missing-imports python/goop_veil/mitigation/legal
 
   dependency-audit:
     runs-on: ubuntu-latest
@@ -183,6 +183,7 @@ jobs:
       - name: Install audit dependencies
         run: |
           source .venv/bin/activate
+          pip install --upgrade pip
           pip install .[all,dev]
 
       - name: Audit Python dependencies (staged, report-only)

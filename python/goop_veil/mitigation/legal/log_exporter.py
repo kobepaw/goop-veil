@@ -14,7 +14,7 @@ import json
 import logging
 import os
 import warnings
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -174,7 +174,7 @@ class TimestampedLogExporter:
         output_path.parent.mkdir(parents=True, exist_ok=True)
 
         payload = {
-            "exported_at": datetime.now(timezone.utc).isoformat(),
+            "exported_at": datetime.now(UTC).isoformat(),
             "version": "1.0",
             "verification": {
                 "mode": self.verification_mode,
@@ -198,7 +198,12 @@ class TimestampedLogExporter:
 
         # Add HMAC to the output document
         payload["hmac"] = hmac_digest
-        output_json = json.dumps(payload, indent=2, sort_keys=True, default=_serialize_model)
+        output_json = json.dumps(
+            payload,
+            indent=2,
+            sort_keys=True,
+            default=_serialize_model,
+        )
         output_path.write_text(output_json, encoding="utf-8")
 
         logger.info(
@@ -226,7 +231,7 @@ class TimestampedLogExporter:
         data = json.loads(log_path.read_text(encoding="utf-8"))
 
         # Remove the stored HMAC field before re-computing
-        stored_hmac = data.pop("hmac", None)
+        data.pop("hmac", None)
 
         # Re-serialize to the same deterministic format used during export
         content_json = json.dumps(data, sort_keys=True, default=_serialize_model)

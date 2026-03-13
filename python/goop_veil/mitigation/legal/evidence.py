@@ -9,8 +9,9 @@ from __future__ import annotations
 
 import hashlib
 import logging
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
+from typing import Any
 
 from goop_veil.config import LegalConfig
 from goop_veil.mitigation.legal.log_exporter import TimestampedLogExporter
@@ -98,7 +99,7 @@ class EvidencePackageGenerator:
             EvidencePackage model with metadata about the generated package.
         """
         alerts = alerts or []
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         ts_str = now.strftime("%Y%m%d_%H%M%S")
 
         # 1. Create output directory
@@ -116,7 +117,7 @@ class EvidencePackageGenerator:
 
         # 4. Export HMAC-signed detection log
         log_path = out_dir / f"detection_log_{ts_str}.json"
-        log_hmac = self._log_exporter.export(
+        self._log_exporter.export(
             alerts, detection_results, log_path, redact_sensitive=redact_sensitive
         )
         logger.info("Signed detection log: %s", log_path)
@@ -177,7 +178,7 @@ class EvidencePackageGenerator:
             disclaimer=DISCLAIMER if self._config.include_disclaimer else "",
         )
 
-    def _build_timeline(self, results: list[DetectionResult]) -> list[dict]:
+    def _build_timeline(self, results: list[DetectionResult]) -> list[dict[str, str]]:
         """Build chronological timeline from detection results.
 
         Each detection result becomes one or more timeline entries sorted
@@ -189,9 +190,9 @@ class EvidencePackageGenerator:
         Returns:
             List of timeline event dicts sorted chronologically.
         """
-        events: list[dict] = []
+        events: list[dict[str, str]] = []
         for result in results:
-            event: dict = {
+            event: dict[str, str] = {
                 "timestamp": result.timestamp.isoformat(),
                 "event": f"Detection: {result.threat_level.value}",
                 "severity": result.threat_level.value,
@@ -212,7 +213,7 @@ class EvidencePackageGenerator:
         events.sort(key=lambda e: e["timestamp"])
         return events
 
-    def _extract_devices(self, results: list[DetectionResult]) -> list[dict]:
+    def _extract_devices(self, results: list[DetectionResult]) -> list[dict[str, Any]]:
         """Extract unique device fingerprints from detection results.
 
         Args:
@@ -222,7 +223,7 @@ class EvidencePackageGenerator:
             List of device dicts (deduplicated by MAC address).
         """
         seen_macs: set[str] = set()
-        devices: list[dict] = []
+        devices: list[dict[str, Any]] = []
         for result in results:
             for dev in result.devices:
                 if dev.mac_address not in seen_macs:
@@ -242,7 +243,10 @@ class EvidencePackageGenerator:
         if not results:
             return "No detections recorded."
 
-        highest_level = max(results, key=lambda r: _THREAT_RANK[r.threat_level]).threat_level.value
+        highest_level = max(
+            results,
+            key=lambda r: _THREAT_RANK[r.threat_level],
+        ).threat_level.value
         all_caps: set[str] = set()
         for r in results:
             for c in r.detected_capabilities:
@@ -260,7 +264,7 @@ class EvidencePackageGenerator:
     def _render_evidence_report(
         self,
         results: list[DetectionResult],
-        timeline: list[dict],
+        timeline: list[dict[str, str]],
         redact_sensitive: bool = True,
     ) -> str:
         """Render the main evidence report as Markdown.
@@ -281,7 +285,7 @@ class EvidencePackageGenerator:
         lines.append("# WiFi Surveillance Detection — Evidence Report")
         lines.append("")
         lines.append(
-            f"**Generated:** {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M UTC')}"
+            f"**Generated:** {datetime.now(UTC).strftime('%Y-%m-%d %H:%M UTC')}"
         )
         lines.append("")
 
@@ -338,8 +342,10 @@ class EvidencePackageGenerator:
             lines.append("")
             lines.append(f"- **Threat Level:** {result.threat_level.value}")
             lines.append(f"- **Confidence:** {result.confidence:.2f}")
-            lines.append(f"- **Channel Hopping Detected:** {'Yes' if result.channel_hop_detected else 'No'}")
-            lines.append(f"- **Espressif Mesh Detected:** {'Yes' if result.espressif_mesh_detected else 'No'}")
+            channel_hop = "Yes" if result.channel_hop_detected else "No"
+            espressif_mesh = "Yes" if result.espressif_mesh_detected else "No"
+            lines.append(f"- **Channel Hopping Detected:** {channel_hop}")
+            lines.append(f"- **Espressif Mesh Detected:** {espressif_mesh}")
             if result.detected_capabilities:
                 caps = ", ".join(c.value for c in result.detected_capabilities)
                 lines.append(f"- **Sensing Capabilities:** {caps}")
@@ -362,10 +368,20 @@ class EvidencePackageGenerator:
             "technology, including:"
         )
         lines.append("")
-        lines.append("- Coordinated Espressif (ESP32/ESP8266) device deployments forming mesh networks.")
-        lines.append("- Anomalous beacon intervals inconsistent with standard WiFi access points.")
-        lines.append("- Rapid channel hopping patterns used for multi-frequency CSI collection.")
-        lines.append("- Periodic signal components in CSI data matching human vital sign frequencies.")
+        lines.append(
+            "- Coordinated Espressif (ESP32/ESP8266) device deployments forming "
+            "mesh networks."
+        )
+        lines.append(
+            "- Anomalous beacon intervals inconsistent with standard WiFi access points."
+        )
+        lines.append(
+            "- Rapid channel hopping patterns used for multi-frequency CSI collection."
+        )
+        lines.append(
+            "- Periodic signal components in CSI data matching human vital sign "
+            "frequencies."
+        )
         lines.append("")
 
         # Appendix
@@ -386,8 +402,8 @@ class EvidencePackageGenerator:
         return "\n".join(lines)
 
     @staticmethod
-    def _redact_devices(devices: list[dict]) -> list[dict]:
-        redacted: list[dict] = []
+    def _redact_devices(devices: list[dict[str, Any]]) -> list[dict[str, Any]]:
+        redacted: list[dict[str, Any]] = []
         for dev in devices:
             clone = dict(dev)
             clone["mac_address"] = _mask_mac(clone.get("mac_address"))
