@@ -35,7 +35,7 @@ Create these labels first.
 - `router-impact` — changes router behavior, safety defaults, or compatibility posture
 - `area:mitigation-router` — router adapters, router support matrix, or apply/dry-run behavior
 - `area:mcp` — MCP server or tool invocation surface
-- `privacy-redaction` — logs, captures, evidence bundles, or redaction policy
+- `privacy-redaction` — logs, captures, report packages, or redaction policy
 - `firmware-experimental` — firmware work outside the supported initial public surface
 - `release-blocker` — must be resolved before the next public release cut
 - `good-first-issue` — narrow scope, clear acceptance criteria, and low-risk review path

@@ -22,7 +22,7 @@ Not panic. Not hype. Practical defense tooling.
 What’s in the beta:
 - scan / detect workflows
 - guarded router-based mitigation paths
-- documentation / evidence bundle generation
+- documentation / report package generation
 - Linux-first support for scanning/capture flows
 
 ## Post 5

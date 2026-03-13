@@ -1,10 +1,10 @@
-"""Legal document templates for WiFi privacy defense.
+"""Reporting templates for WiFi privacy defense.
 
-All templates generate Markdown text with appropriate legal disclaimers.
-Templates cover FCC complaints, cease-and-desist letters, and incident reports
-related to unauthorized radio frequency surveillance and privacy-invasive sensing.
+These templates generate Markdown text with advisory disclaimers and cover
+FCC complaints, cease-and-desist letters, and incident reports related to
+unauthorized radio frequency surveillance and privacy-invasive sensing.
 
-NOTE: These documents are NOT legal advice. See DISCLAIMER constant.
+NOTE: These documents are not professional advice. See `DISCLAIMER`.
 """
 
 from __future__ import annotations
@@ -22,7 +22,7 @@ DISCLAIMER: Final[str] = (
 
 
 class FCCComplaintTemplate:
-    """Generates FCC complaint content from detection evidence.
+    """Generates FCC complaint content from detection data.
 
     Produces a formatted complaint citing relevant FCC regulations including
     47 CFR Part 15 and 47 USC 333 where active transmission is involved.
@@ -191,11 +191,11 @@ class FCCComplaintTemplate:
 class CeaseAndDesistTemplate:
     """Generates cease-and-desist letter content.
 
-    Adapts legal basis by state, including Illinois BIPA, California
+    Adapts cited authorities by state, including Illinois BIPA, California
     CCPA/CPRA, common law intrusion upon seclusion, and state wiretap laws.
     """
 
-    # State-specific legal bases
+    # State-specific authorities and citations
     _STATE_LEGAL_BASES: Final[dict[str, list[str]]] = {
         "illinois": [
             "Illinois Biometric Information Privacy Act (BIPA), 740 ILCS 14 — "
@@ -242,7 +242,7 @@ class CeaseAndDesistTemplate:
             recipient_name: Name of the recipient.
             recipient_address: Address of the recipient.
             detection_summary: Summary of detected surveillance activity.
-            state: US state (lowercase) for state-specific legal citations.
+            state: US state (lowercase) for state-specific citations.
 
         Returns:
             Markdown-formatted cease-and-desist letter.
@@ -315,7 +315,7 @@ class CeaseAndDesistTemplate:
             "their wiretapping or eavesdropping statutes."
         )
 
-        # State-specific legal bases
+        # State-specific authorities
         state_lower = state.lower().strip()
         if state_lower in self._STATE_LEGAL_BASES:
             for basis in self._STATE_LEGAL_BASES[state_lower]:

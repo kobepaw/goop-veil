@@ -6,7 +6,7 @@
 This release is a narrow public beta focused on the software stack:
 - detection / scan workflows
 - guarded mitigation guidance and router integration paths
-- documentation / evidence bundle generation
+- documentation / report package generation
 
 ## What changed before beta
 - hardened router adapter defaults and confirmation flows

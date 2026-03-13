@@ -123,12 +123,12 @@ Estimated effectiveness: 80%
 ```
 
 ### `goop-veil report capture.pcap`
-Generate an report package with chain-of-custody documentation.
+Generate a report package with signed incident documentation.
 
 ```
 $ goop-veil report capture.pcap --output-dir data/reports
 Report Package Generated
-Output: data/reports/evidence_20260308_143022/
+Output: data/reports/
 Report hash: a3f8c91b2d4e7f01...
 Devices documented: 2
 Timeline events: 47
@@ -231,7 +231,7 @@ Reporting and regulatory outcomes are jurisdiction-specific and evolving. goop-v
 - Detection confidence is heuristic and should be treated as a lead, not a definitive attribution.
 - Mitigation effectiveness depends on router model/firmware, RF conditions, and attacker behavior.
 - Router support varies by family, model, and firmware; see [docs/ROUTER_COMPATIBILITY.md](./docs/ROUTER_COMPATIBILITY.md).
-- Evidence bundles provide integrity-oriented logging, not courtroom admissibility guarantees.
+- Report packages provide integrity-oriented logging, not courtroom admissibility guarantees.
 - The project provides technical tooling only and does not determine reporting or regulatory outcomes.
 
 ---

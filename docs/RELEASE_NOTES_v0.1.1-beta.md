@@ -14,7 +14,7 @@ Your WiFi can be used to sense you through walls. goop-veil is an open-source re
 ## What this beta does
 - **Detect** suspicious sensing indicators such as Espressif mesh patterns, channel hopping, and CSI-related signatures
 - **Degrade** sensing reliability through supported router controls and legitimate traffic orchestration
-- **Document** incidents with timestamped, HMAC-signed evidence bundles for review/reporting workflows
+- **Document** incidents with timestamped, HMAC-signed report packages for review/reporting workflows
 
 ## Important limits
 - This is a **research preview**, not a determination, attribution, or compliance certification product.
@@ -29,7 +29,7 @@ pip install 'git+https://github.com/kobepaw/goop-veil.git#egg=goop-veil[cli]'
 goop-veil scan
 goop-veil detect capture.pcap
 goop-veil mitigate
-goop-veil evidence capture.pcap
+goop-veil report capture.pcap
 ```
 
 ## Feedback we want

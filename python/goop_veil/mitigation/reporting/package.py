@@ -14,6 +14,7 @@ from pathlib import Path
 from typing import Any
 
 from goop_veil.config import ReportingConfig
+from goop_veil.mitigation.models import ReportPackage
 from goop_veil.mitigation.reporting.log_exporter import TimestampedLogExporter
 from goop_veil.mitigation.reporting.templates import (
     DISCLAIMER,
@@ -21,7 +22,6 @@ from goop_veil.mitigation.reporting.templates import (
     FCCComplaintTemplate,
     IncidentReportTemplate,
 )
-from goop_veil.mitigation.models import ReportPackage
 from goop_veil.models import DetectionResult, ThreatLevel, VeilAlert
 
 logger = logging.getLogger(__name__)

@@ -100,21 +100,21 @@ class TestHighThreat:
         # Should have multiple recommendations
         assert len(plan.recommendations) >= 5
 
-    def test_high_threat_includes_legal(self):
+    def test_high_threat_includes_reporting_package_action(self):
         advisor, _ = _make_advisor_with_mock()
         detection = _make_detection(ThreatLevel.HIGH)
         plan = advisor.assess_and_recommend(detection)
         categories = [r.category for r in plan.recommendations]
         assert MitigationCategory.REPORTING_ACTION in categories
 
-    def test_confirmed_threat_includes_legal(self):
+    def test_confirmed_threat_includes_reporting_package_action(self):
         advisor, _ = _make_advisor_with_mock()
         detection = _make_detection(ThreatLevel.CONFIRMED)
         plan = advisor.assess_and_recommend(detection)
         categories = [r.category for r in plan.recommendations]
         assert MitigationCategory.REPORTING_ACTION in categories
 
-    def test_low_threat_no_legal(self):
+    def test_low_threat_skips_reporting_package_action(self):
         advisor, _ = _make_advisor_with_mock()
         detection = _make_detection(ThreatLevel.LOW)
         plan = advisor.assess_and_recommend(detection)

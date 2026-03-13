@@ -14,7 +14,7 @@ Repo: https://github.com/kobepaw/goop-veil
 To our knowledge, goop-veil is the first open-source tool built specifically to detect, degrade, and document WiFi CSI surveillance by programmatically reconfiguring existing consumer routers.
 
 ### 50-word pitch
-WiFi CSI sensing can infer presence, motion, breathing, and heartbeat through walls using cheap hardware such as ESP32s. goop-veil is a software-only research preview that detects suspicious sensing conditions, degrades sensing reliability through supported routers, and generates signed evidence bundles for reporting and review workflows.
+WiFi CSI sensing can infer presence, motion, breathing, and heartbeat through walls using cheap hardware such as ESP32s. goop-veil is a software-only research preview that detects suspicious sensing conditions, degrades sensing reliability through supported routers, and generates signed report packages for reporting and review workflows.
 
 ### Taglines
 - Detect. Degrade. Document.
@@ -58,7 +58,7 @@ So this release focuses on a narrow, honest goal: **detect, degrade, and documen
 
 - **Detect:** scan for Espressif mesh networks, suspicious traffic patterns, rapid channel hopping, and CSI-related signatures.
 - **Degrade:** reconfigure supported routers (OpenWrt, UniFi, TP-Link) to reduce sensing reliability using research-backed countermeasures like cover traffic, TX power variation, and band steering.
-- **Document:** generate timestamped, HMAC-signed evidence bundles for review and reporting workflows.
+- **Document:** generate timestamped, HMAC-signed report packages for review and reporting workflows.
 
 It is a **software-only research preview**, not a determination engine, attribution engine, or compliance certification product. The point is to make sensing less reliable and better documented — not to pretend the problem is solved.
 
@@ -87,7 +87,7 @@ Happy to answer questions about the signal physics, router controls, measured co
 4. goop-veil does three things:
    - Detect suspicious sensing conditions
    - Reconfigure supported routers to degrade sensing reliability
-   - Generate HMAC-signed evidence bundles for reporting/review workflows
+   - Generate HMAC-signed report packages for reporting/review workflows
 
 5. It’s backed by published countermeasure research, but the promise is intentionally honest:
 

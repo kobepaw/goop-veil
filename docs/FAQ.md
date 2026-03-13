@@ -27,7 +27,7 @@ The project is designed around local workflows. Optional sharing/integration fea
 ## Can this help with reporting?
 Yes — the project can generate documentation artifacts that may help with internal records and reporting workflows. Whether a specific response path makes sense depends on context.
 
-## Are the evidence bundles court-ready?
+## Are the report packages court-ready?
 No guarantee is made that generated artifacts will satisfy any court, regulator, or agency requirement. They are technical documentation artifacts that may help with internal review or reporting workflows.
 
 ## What about the firmware in this repo?

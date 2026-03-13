@@ -7,7 +7,7 @@ Messaging guardrails for this file:
 - Avoid certainty framing, compliance certification language, and guaranteed outcomes.
 - Avoid "first" and "100%" style claims.
 - Use "500+ automated tests" consistently.
-- Use current CLI syntax (`goop-veil detect <pcap>`, `goop-veil evidence <pcap>`).
+- Use current CLI syntax (`goop-veil detect <pcap>`, `goop-veil report <pcap>`).
 
 Required disclaimer copy (reuse in posts/interviews):
 "goop-veil is a software-only research preview. It provides technical signals and documentation artifacts, not determinations or compliance certification. Detection and mitigation results vary by environment."
@@ -174,7 +174,7 @@ I released goop-veil, an open-source tool (Apache-2.0) that does three things:
 
 2. **Mitigates** through your existing router. Software-only countermeasures that degrade sensing accuracy: TX power variation (93% misclassification rate per Wi-Spoof 2025), cover traffic generation (drops detection to 47% per UChicago NDSS 2020), band steering to 5 GHz (doubles wall attenuation), and more.
 
-3. **Documents** incident telemetry. Generates HMAC-signed evidence bundles with device fingerprints, timestamps, and chain-of-custody documentation for records and counsel review.
+3. **Documents** incident telemetry. Generates HMAC-signed report packages with device fingerprints, timestamps, and signed documentation for records and external review.
 
 WiFi CSI reporting and regulatory questions are evolving and jurisdiction-specific.
 
@@ -239,7 +239,7 @@ pip install goop-veil[cli]
 goop-veil scan            # No root needed
 goop-veil detect file.pcap
 goop-veil mitigate --router-host 192.168.1.1 --router-type openwrt
-goop-veil evidence file.pcap
+goop-veil report file.pcap
 ```
 
 Source: https://github.com/kobepaw/goop-veil
@@ -274,7 +274,7 @@ I built goop-veil because practical defenses are still limited and underexplored
 
 4. `goop-veil assess --room 4.5x3.5x2.7 --budget 200` -- room vulnerability assessment with material recommendations and cost estimates (RF shielding film, metallic curtains, etc.).
 
-5. `goop-veil evidence capture.pcap` -- generates HMAC-signed documentation bundles if you need incident records.
+5. `goop-veil report capture.pcap` -- generates HMAC-signed report packages if you need incident records.
 
 **Technical details for the self-hosted crowd:**
 
@@ -416,7 +416,7 @@ goop-veil generates HMAC-signed documentation bundles for incident records and r
 Each evidence package includes timestamped detection logs, device fingerprints with OUI attribution, signal analysis with Fresnel zone calculations, a timeline of sensing activity, and chain-of-custody documentation. Reports are hash-signed for integrity verification.
 
 ```
-goop-veil evidence capture.pcap --output-dir data/reports
+goop-veil report capture.pcap --output-dir data/reports
 ```
 
 ## How the Technology Works
@@ -468,10 +468,10 @@ Assess your room's physical vulnerability:
 goop-veil assess --room 4.5x3.5x2.7 --budget 200
 ```
 
-Generate an evidence bundle:
+Generate a report package:
 
 ```bash
-goop-veil evidence scan.pcap --output-dir data/reports
+goop-veil report scan.pcap --output-dir data/reports
 ```
 
 goop-veil also runs as an MCP server for integration with AI assistants, and offers a web dashboard for continuous monitoring.

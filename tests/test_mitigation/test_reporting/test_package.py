@@ -108,7 +108,7 @@ class TestOutputDirectory:
         assert out_dir.is_dir()
 
     def test_generate_with_custom_output_dir(self, generator, sample_detection, tmp_path):
-        custom_dir = tmp_path / "custom_evidence"
+        custom_dir = tmp_path / "custom_reports"
         generator.generate([sample_detection], output_dir=custom_dir)
         assert custom_dir.exists()
 
@@ -214,7 +214,7 @@ class TestReportPackageModel:
         pkg = gen.generate([sample_detection])
         assert pkg.disclaimer == ""
 
-    def test_returns_evidence_package_type(self, generator, sample_detection):
+    def test_returns_report_package_type(self, generator, sample_detection):
         pkg = generator.generate([sample_detection])
         assert isinstance(pkg, ReportPackage)
 
