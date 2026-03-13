@@ -33,7 +33,7 @@ IEEE 802.11bf was ratified in September 2025. It standardized what researchers h
 - **Policy still lags the capability.** There is no clear federal ban on private-party WiFi CSI sensing.
 - **Practical defense tooling is still early.** goop-veil is built for detection, degradation, and documentation rather than magical prevention claims.
 
-To our knowledge, goop-veil is the first open-source tool built specifically to programmatically reconfigure existing consumer routers to fight back against WiFi CSI surveillance. It is an open-source research preview that detects potential sensing activity, applies software-only countermeasures through supported routers, and generates evidence bundles for documentation workflows.
+To our knowledge, goop-veil is the first open-source tool built specifically to programmatically reconfigure existing consumer routers to fight back against WiFi CSI surveillance. It is an open-source research preview that detects potential sensing activity, applies software-only countermeasures through supported routers, and generates report bundles for documentation workflows.
 
 ---
 
@@ -46,7 +46,7 @@ Scan your WiFi environment for sensing devices and suspicious conditions. Identi
 Software-only countermeasures applied through your existing router. No new hardware needed. Reconfigures channel, bandwidth, TX power, band steering, and PMF settings via router APIs (OpenWrt, UniFi, TP-Link). Orchestrates legitimate network traffic to degrade sensing accuracy.
 
 ### 3. Document
-Generates timestamped, HMAC-signed evidence packages for incident documentation and reporting/review workflows.
+Generates timestamped, HMAC-signed report packages for incident documentation and reporting/review workflows.
 
 goop-veil is software-only and currently positioned as a research preview. The goal is to make sensing less reliable and better documented, not to promise perfect prevention or attribution.
 
@@ -67,8 +67,8 @@ goop-veil detect capture.pcap
 # Review mitigation recommendations before applying any router changes
 goop-veil mitigate
 
-# Generate an evidence/documentation package
-goop-veil evidence capture.pcap
+# Generate a report/documentation package
+goop-veil report capture.pcap
 ```
 
 If you are evaluating router support first, see [docs/ROUTER_COMPATIBILITY.md](./docs/ROUTER_COMPATIBILITY.md).
@@ -122,12 +122,12 @@ Estimated effectiveness: 80%
   5  Enable 802.11w PMF (required)      40%            easy              none
 ```
 
-### `goop-veil evidence capture.pcap`
-Generate an evidence package with chain-of-custody documentation.
+### `goop-veil report capture.pcap`
+Generate an report package with chain-of-custody documentation.
 
 ```
-$ goop-veil evidence capture.pcap --output-dir data/reports
-Evidence Package Generated
+$ goop-veil report capture.pcap --output-dir data/reports
+Report Package Generated
 Output: data/reports/evidence_20260308_143022/
 Report hash: a3f8c91b2d4e7f01...
 Devices documented: 2
@@ -272,7 +272,7 @@ goop-veil exposes 7 tools via the Model Context Protocol for agent-driven WiFi d
 | `deploy_countermeasures` | BroRL-adaptive technique selection |
 | `share_sensing_signature` | Share detection signatures with federation |
 | `mitigate_wifi_sensing` | Recommend and apply router mitigations |
-| `generate_evidence_report` | Evidence package generation |
+| `generate_report_package` | Report package generation |
 
 Configure in your MCP client:
 

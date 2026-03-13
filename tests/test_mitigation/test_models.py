@@ -12,7 +12,7 @@ import pytest
 from pydantic import ValidationError
 
 from goop_veil.mitigation.models import (
-    EvidencePackage,
+    ReportPackage,
     MitigationCategory,
     MitigationDifficulty,
     MitigationPlan,
@@ -36,7 +36,7 @@ class TestMitigationCategory:
         assert MitigationCategory.BAND_MIGRATION == "band_migration"
         assert MitigationCategory.PMF_ENABLEMENT == "pmf_enablement"
         assert MitigationCategory.BEAMFORMING_CONTROL == "beamforming_control"
-        assert MitigationCategory.LEGAL_ACTION == "legal_action"
+        assert MitigationCategory.REPORTING_ACTION == "reporting_action"
         assert MitigationCategory.CHANNEL_MANAGEMENT == "channel_management"
         assert MitigationCategory.BEACON_MANAGEMENT == "beacon_management"
 
@@ -249,15 +249,15 @@ class TestRouterStatus:
 
 
 # ---------------------------------------------------------------------------
-# EvidencePackage tests
+# ReportPackage tests
 # ---------------------------------------------------------------------------
 
 
-class TestEvidencePackage:
-    """EvidencePackage creation and defaults."""
+class TestReportPackage:
+    """ReportPackage creation and defaults."""
 
     def test_default_creation(self):
-        pkg = EvidencePackage()
+        pkg = ReportPackage()
         assert pkg.detection_results == []
         assert pkg.device_fingerprints == []
         assert pkg.timeline == []
@@ -266,12 +266,12 @@ class TestEvidencePackage:
         assert "automatically" in pkg.disclaimer
 
     def test_full_creation(self):
-        pkg = EvidencePackage(
+        pkg = ReportPackage(
             timestamp=datetime(2026, 3, 8, 12, 0, 0),
             detection_results=[{"threat": "high"}],
             device_fingerprints=[{"mac": "aa:bb:cc:dd:ee:ff"}],
             timeline=[{"event": "detected", "time": "12:00"}],
-            output_path="/tmp/evidence.json",
+            output_path="/tmp/report.json",
             report_hash="abc123",
             disclaimer="Custom disclaimer.",
         )
@@ -279,6 +279,6 @@ class TestEvidencePackage:
         assert pkg.report_hash == "abc123"
 
     def test_frozen(self):
-        pkg = EvidencePackage()
+        pkg = ReportPackage()
         with pytest.raises(ValidationError):
             pkg.report_hash = "changed"

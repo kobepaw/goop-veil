@@ -46,7 +46,7 @@ _EFFECTIVENESS = {
     "beamforming_disable": 0.60, # Eliminates BFI leak (LeakyBeam)
     "beacon_interval": 0.55,     # Reduces passive CSI samples
     "pmf_enablement": 0.40,      # Prevents forced disassociation
-    "legal_action": 0.0,         # Remedy, not technical defense
+    "reporting_action": 0.0,     # Documentation, not technical defense
 }
 
 # Difficulty-to-score mapping (higher = easier)
@@ -290,18 +290,17 @@ class MitigationAdvisor:
                 wifi_impact="none",
             ))
 
-        # --- Legal action (always last) ---
+        # --- Reporting action (always last) ---
         if threat in (ThreatLevel.HIGH, ThreatLevel.CONFIRMED):
             recs.append(MitigationRecommendation(
-                category=MitigationCategory.LEGAL_ACTION,
-                title="Document evidence for legal action",
+                category=MitigationCategory.REPORTING_ACTION,
+                title="Generate reporting package",
                 description=(
-                    "Generate an evidence package with detection results, device "
-                    "fingerprints, and timeline for potential legal proceedings. "
-                    "Unauthorized WiFi sensing may violate federal wiretapping "
-                    "laws (18 U.S.C. 2511) and state privacy statutes."
+                    "Generate a report package with detection results, device "
+                    "fingerprints, and timeline for review, documentation, or "
+                    "handoff to counsel or investigators if needed."
                 ),
-                effectiveness_score=_EFFECTIVENESS["legal_action"],
+                effectiveness_score=_EFFECTIVENESS["reporting_action"],
                 difficulty=MitigationDifficulty.MODERATE,
                 auto_applicable=False,
                 requires_router=False,
@@ -329,11 +328,11 @@ class MitigationAdvisor:
         router_status = self._get_router_status()
         recs = self._build_recommendations(detection_result, router_status)
 
-        # Sort by composite ranking score (descending), but legal always last
-        legal = [r for r in recs if r.category == MitigationCategory.LEGAL_ACTION]
-        non_legal = [r for r in recs if r.category != MitigationCategory.LEGAL_ACTION]
-        non_legal.sort(key=_rank_score, reverse=True)
-        sorted_recs = non_legal + legal
+        # Sort by composite ranking score (descending), but reporting always last
+        reporting = [r for r in recs if r.category == MitigationCategory.REPORTING_ACTION]
+        non_reporting = [r for r in recs if r.category != MitigationCategory.REPORTING_ACTION]
+        non_reporting.sort(key=_rank_score, reverse=True)
+        sorted_recs = non_reporting + reporting
 
         # Estimate overall effectiveness (weighted average of top-3 or all if fewer)
         top_n = sorted_recs[:3] if len(sorted_recs) >= 3 else sorted_recs
@@ -471,7 +470,7 @@ class MitigationAdvisor:
         if not recs:
             return "No mitigations needed — no significant threats detected."
 
-        tech_recs = [r for r in recs if r.category != MitigationCategory.LEGAL_ACTION]
+        tech_recs = [r for r in recs if r.category != MitigationCategory.REPORTING_ACTION]
         auto_count = sum(1 for r in tech_recs if r.auto_applicable)
 
         parts = [

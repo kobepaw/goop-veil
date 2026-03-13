@@ -1,4 +1,4 @@
-"""Mitigation layer data models — recommendations, plans, router status, evidence.
+"""Mitigation layer data models — recommendations, plans, router status, reporting.
 
 All models are Pydantic v2 frozen (immutable after creation).
 """
@@ -22,7 +22,7 @@ class MitigationCategory(StrEnum):
     BAND_MIGRATION = "band_migration"
     PMF_ENABLEMENT = "pmf_enablement"
     BEAMFORMING_CONTROL = "beamforming_control"
-    LEGAL_ACTION = "legal_action"
+    REPORTING_ACTION = "reporting_action"
     CHANNEL_MANAGEMENT = "channel_management"
     BEACON_MANAGEMENT = "beacon_management"
 
@@ -84,8 +84,8 @@ class RouterStatus(BaseModel):
     changes_applied: list[str] = Field(default_factory=list)
 
 
-class EvidencePackage(BaseModel):
-    """Legal evidence package with detection results and device fingerprints."""
+class ReportPackage(BaseModel):
+    """Report package with detection results and device fingerprints."""
 
     model_config = ConfigDict(frozen=True, extra="forbid")
 
@@ -96,6 +96,6 @@ class EvidencePackage(BaseModel):
     output_path: str = ""
     report_hash: str = ""
     disclaimer: str = (
-        "This report is generated automatically and may not constitute "
-        "admissible evidence in all jurisdictions. Consult legal counsel."
+        "This report is generated automatically and may not fit every workflow. "
+        "Consult a qualified professional as needed."
     )

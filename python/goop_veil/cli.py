@@ -454,7 +454,7 @@ def mitigate(
     """Recommend and apply software-only WiFi privacy mitigations.
 
     Analyzes detection results and recommends ranked countermeasures:
-    router reconfiguration, traffic orchestration, and legal action.
+    router reconfiguration, traffic orchestration, and reporting.
     """
     from goop_veil.config import VeilConfig
     from goop_veil.mitigation.advisor import MitigationAdvisor
@@ -560,22 +560,22 @@ def mitigate(
 
 
 # =============================================================================
-# evidence — legal documentation
+# report — documentation package
 # =============================================================================
 
 
 @app.command()
-def evidence(
+def report(
     pcap: Path = typer.Argument(..., help="Path to pcap file", exists=True),
-    output_dir: str = typer.Option("data/legal", help="Output directory"),
+    output_dir: str = typer.Option("data/reports", help="Output directory"),
     json_output: bool = typer.Option(False, "--json", help="Output as JSON"),
 ) -> None:
-    """Generate legal evidence package from detection results."""
-    from goop_veil.config import LegalConfig, VeilConfig
+    """Generate a report package from detection results."""
+    from goop_veil.config import ReportingConfig, VeilConfig
     from goop_veil.detection.alert_engine import AlertEngine
     from goop_veil.detection.beacon_scanner import BeaconScanner
     from goop_veil.detection.traffic_analyzer import TrafficAnalyzer
-    from goop_veil.mitigation.legal.evidence import EvidencePackageGenerator
+    from goop_veil.mitigation.reporting.package import ReportPackageGenerator
 
     config = VeilConfig()
     scanner = BeaconScanner(config.detection)
@@ -591,8 +591,8 @@ def evidence(
         traffic_threat=threat_level,
     )
 
-    legal_config = LegalConfig(output_dir=output_dir)
-    generator = EvidencePackageGenerator(config=legal_config)
+    reporting_config = ReportingConfig(output_dir=output_dir)
+    generator = ReportPackageGenerator(config=reporting_config)
     package = generator.generate(
         detection_results=[result],
         alerts=list(engine.alerts),
@@ -609,7 +609,7 @@ def evidence(
         }))
         return
 
-    console.print(f"\n[bold]Evidence Package Generated[/bold]")
+    console.print(f"\n[bold]Report Package Generated[/bold]")
     console.print(f"Output: {package.output_path}")
     console.print(f"Report hash: {package.report_hash[:16]}...")
     console.print(f"Devices documented: {len(package.device_fingerprints)}")

@@ -116,7 +116,7 @@ jobs:
       - name: Run ruff (staged surface)
         run: |
           source .venv/bin/activate
-          ruff check python/goop_veil/mitigation/legal
+          ruff check python/goop_veil/mitigation/reporting
 
   mypy:
     runs-on: ubuntu-latest
@@ -152,7 +152,7 @@ jobs:
       - name: Run mypy (staged, report-only)
         run: |
           source .venv/bin/activate
-          mypy --ignore-missing-imports python/goop_veil/mitigation/legal
+          mypy --ignore-missing-imports python/goop_veil/mitigation/reporting
 
   dependency-audit:
     runs-on: ubuntu-latest

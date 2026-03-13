@@ -313,7 +313,7 @@ def _create_mcp_server():
         """Analyze WiFi sensing threats and recommend software-only mitigations.
 
         Recommends ranked mitigations: router reconfiguration (channel, bandwidth,
-        TX power, PMF, band steering), traffic orchestration, and legal documentation.
+        TX power, PMF, band steering), traffic orchestration, and reporting.
         Optionally auto-applies safe router changes with user confirmation.
 
         Args:
@@ -401,18 +401,18 @@ def _create_mcp_server():
         })
 
     @mcp_server.tool()
-    async def generate_evidence_report(
+    async def generate_report_package(
         pcap_path: str | None = None,
-        output_dir: str = "data/legal",
+        output_dir: str = "data/reports",
         include_fcc_complaint: bool = True,
         include_cease_desist: bool = True,
         redact_sensitive: bool = True,
     ) -> str:
-        """Generate a legal evidence package from WiFi sensing detection results.
+        """Generate a report package from WiFi sensing detection results.
 
         Creates timestamped, HMAC-signed documentation suitable for filing
         FCC complaints, cease-and-desist letters, or law enforcement reports.
-        All documents include a disclaimer that they are not legal advice.
+        Generated artifacts include an advisory disclaimer.
 
         Args:
             pcap_path: Path to pcap file with detection data.
@@ -424,7 +424,7 @@ def _create_mcp_server():
         _init()
 
         def _generate():
-            from goop_veil.mitigation.legal.evidence import EvidencePackageGenerator
+            from goop_veil.mitigation.reporting.package import ReportPackageGenerator
 
             # Get detection results
             results = []
@@ -444,9 +444,9 @@ def _create_mcp_server():
                     results.append(result)
                     alerts = list(_alert_engine.alerts)
 
-            from goop_veil.config import LegalConfig
-            legal_config = LegalConfig(output_dir=output_dir)
-            generator = EvidencePackageGenerator(config=legal_config)
+            from goop_veil.config import ReportingConfig
+            reporting_config = ReportingConfig(output_dir=output_dir)
+            generator = ReportPackageGenerator(config=reporting_config)
 
             package = generator.generate(
                 detection_results=results,
