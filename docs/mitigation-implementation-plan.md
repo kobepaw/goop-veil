@@ -112,9 +112,9 @@ python/goop_veil/mitigation/
 │   ├── generators.py             # Legitimate traffic pattern generators
 │   ├── smart_home.py             # IoT device coordination (mDNS/SSDP)
 │   └── scheduler.py              # Scheduled task manager
-└── legal/
+└── reporting/
     ├── __init__.py
-    ├── evidence.py                # EvidencePackageGenerator
+    ├── package.py                 # ReportPackageGenerator
     ├── templates.py               # FCC complaint, C&D, incident report
     └── log_exporter.py            # HMAC-signed detection log export
 ```
@@ -147,12 +147,12 @@ score = 0.5 * effectiveness + 0.2 * ease + 0.2 * speed + 0.1 * auto_bonus
 ### New MCP Tools
 
 1. `mitigate_wifi_sensing` — analyze + recommend + optionally auto-apply
-2. `generate_evidence_report` — legal evidence package with HMAC-signed logs
+2. `generate_report_summary` — signed report package with HMAC-signed logs
 
 ### New CLI Commands
 
 1. `goop-veil mitigate` — recommend and apply mitigations
-2. `goop-veil evidence` — generate legal documentation
+2. `goop-veil report` — generate signed incident documentation
 
 ---
 
@@ -177,7 +177,7 @@ High-bandwidth legitimate traffic degrades CSI sensing (UChicago: 47% detection 
 class MitigationConfig(_VeilBaseConfig):
     router: RouterConfig        # adapter_type, host, apply_changes (default: False = dry-run)
     traffic: TrafficConfig      # enabled, max_bandwidth_mbps, schedule_enabled
-    legal: LegalConfig          # output_dir, include_disclaimer (always True)
+    reporting: ReportingConfig  # output_dir, include_disclaimer (always True)
 ```
 
 Router credentials via `VEIL_ROUTER_PASSWORD` env var (never in config files).
@@ -207,8 +207,8 @@ Router credentials via `VEIL_ROUTER_PASSWORD` env var (never in config files).
 1. **Dry-run by default** — `apply_changes: bool = False`. No accidental network disruption.
 2. **Credentials via env var** — never stored in config files.
 3. **Legitimate traffic only** — all generated traffic is real HTTP/DNS/NTP. No jamming.
-4. **Legal disclaimer always included** — "This is NOT legal advice."
-5. **Markdown output for legal docs** — lightweight, convertible to PDF externally.
+4. **Advisory disclaimer always included** — "This is NOT legal advice."
+5. **Markdown output for reporting docs** — lightweight, convertible to PDF externally.
 6. **Smart home discovery optional** — `zeroconf` not in base install.
 7. **Terminology compliance** — all new code scanned by CI gate. Legal templates use approved terms.
 

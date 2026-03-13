@@ -1,4 +1,4 @@
-"""Mitigation layer data models — recommendations, plans, router status, evidence.
+"""Mitigation layer data models — recommendations, plans, router status, reporting.
 
 All models are Pydantic v2 frozen (immutable after creation).
 """
@@ -7,6 +7,7 @@ from __future__ import annotations
 
 from datetime import datetime
 from enum import StrEnum
+from typing import Any
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -21,7 +22,7 @@ class MitigationCategory(StrEnum):
     BAND_MIGRATION = "band_migration"
     PMF_ENABLEMENT = "pmf_enablement"
     BEAMFORMING_CONTROL = "beamforming_control"
-    LEGAL_ACTION = "legal_action"
+    REPORTING_ACTION = "reporting_action"
     CHANNEL_MANAGEMENT = "channel_management"
     BEACON_MANAGEMENT = "beacon_management"
 
@@ -83,18 +84,18 @@ class RouterStatus(BaseModel):
     changes_applied: list[str] = Field(default_factory=list)
 
 
-class EvidencePackage(BaseModel):
-    """Legal evidence package with detection results and device fingerprints."""
+class ReportPackage(BaseModel):
+    """Report package with detection results and device fingerprints."""
 
     model_config = ConfigDict(frozen=True, extra="forbid")
 
     timestamp: datetime = Field(default_factory=datetime.now)
-    detection_results: list[dict] = Field(default_factory=list)
-    device_fingerprints: list[dict] = Field(default_factory=list)
-    timeline: list[dict] = Field(default_factory=list)
+    detection_results: list[dict[str, Any]] = Field(default_factory=list)
+    device_fingerprints: list[dict[str, Any]] = Field(default_factory=list)
+    timeline: list[dict[str, Any]] = Field(default_factory=list)
     output_path: str = ""
     report_hash: str = ""
     disclaimer: str = (
-        "This report is generated automatically and may not constitute "
-        "admissible evidence in all jurisdictions. Consult legal counsel."
+        "This report is generated automatically and may not fit every workflow. "
+        "Consult a qualified professional as needed."
     )

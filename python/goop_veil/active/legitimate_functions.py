@@ -1,4 +1,4 @@
-"""Legitimate functions — manages the real WiFi services that provide legal basis.
+"""Legitimate functions — manages the real WiFi services that justify operation.
 
 Each active defense node runs genuine WiFi services:
 1. WiFi Mesh Access Point (beacons, data, ACKs, mesh peering)

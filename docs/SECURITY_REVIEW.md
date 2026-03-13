@@ -24,7 +24,7 @@ If a path is incomplete, fragile, or lightly tested, label it clearly as experim
 Changes touching these areas require extra care:
 - `python/goop_veil/mcp/`
 - `python/goop_veil/mitigation/router/`
-- `python/goop_veil/mitigation/legal/` (or future reporting/documentation path)
+- `python/goop_veil/mitigation/reporting/`
 - `python/goop_veil/integration/`
 - `firmware/`
 - `README.md`

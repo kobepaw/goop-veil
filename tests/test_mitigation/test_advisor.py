@@ -100,26 +100,26 @@ class TestHighThreat:
         # Should have multiple recommendations
         assert len(plan.recommendations) >= 5
 
-    def test_high_threat_includes_legal(self):
+    def test_high_threat_includes_reporting_package_action(self):
         advisor, _ = _make_advisor_with_mock()
         detection = _make_detection(ThreatLevel.HIGH)
         plan = advisor.assess_and_recommend(detection)
         categories = [r.category for r in plan.recommendations]
-        assert MitigationCategory.LEGAL_ACTION in categories
+        assert MitigationCategory.REPORTING_ACTION in categories
 
-    def test_confirmed_threat_includes_legal(self):
+    def test_confirmed_threat_includes_reporting_package_action(self):
         advisor, _ = _make_advisor_with_mock()
         detection = _make_detection(ThreatLevel.CONFIRMED)
         plan = advisor.assess_and_recommend(detection)
         categories = [r.category for r in plan.recommendations]
-        assert MitigationCategory.LEGAL_ACTION in categories
+        assert MitigationCategory.REPORTING_ACTION in categories
 
-    def test_low_threat_no_legal(self):
+    def test_low_threat_skips_reporting_package_action(self):
         advisor, _ = _make_advisor_with_mock()
         detection = _make_detection(ThreatLevel.LOW)
         plan = advisor.assess_and_recommend(detection)
         categories = [r.category for r in plan.recommendations]
-        assert MitigationCategory.LEGAL_ACTION not in categories
+        assert MitigationCategory.REPORTING_ACTION not in categories
 
 
 # ---------------------------------------------------------------------------
@@ -203,24 +203,24 @@ class TestThreatSpecificPrioritization:
 class TestRankingOrder:
     """Recommendations should be ranked by composite score."""
 
-    def test_legal_action_always_last(self):
+    def test_reporting_action_always_last(self):
         advisor, _ = _make_advisor_with_mock()
         detection = _make_detection(ThreatLevel.HIGH)
         plan = advisor.assess_and_recommend(detection)
         if plan.recommendations:
             last = plan.recommendations[-1]
-            assert last.category == MitigationCategory.LEGAL_ACTION
+            assert last.category == MitigationCategory.REPORTING_ACTION
 
     def test_ranking_scores_descending(self):
-        """Non-legal recommendations should be in descending rank score."""
+        """Non-reporting recommendations should be in descending rank score."""
         advisor, _ = _make_advisor_with_mock()
         detection = _make_detection(ThreatLevel.HIGH)
         plan = advisor.assess_and_recommend(detection)
-        non_legal = [
+        non_reporting = [
             r for r in plan.recommendations
-            if r.category != MitigationCategory.LEGAL_ACTION
+            if r.category != MitigationCategory.REPORTING_ACTION
         ]
-        scores = [_rank_score(r) for r in non_legal]
+        scores = [_rank_score(r) for r in non_reporting]
         for i in range(len(scores) - 1):
             assert scores[i] >= scores[i + 1], (
                 f"Score at index {i} ({scores[i]:.3f}) < score at index {i+1} ({scores[i+1]:.3f})"
@@ -266,14 +266,14 @@ class TestAutoApply:
         applied = advisor.auto_apply(plan, dry_run=False, confirmed=True)
         assert applied == []
 
-    def test_legal_not_auto_applied(self):
+    def test_reporting_not_auto_applied(self):
         advisor, router = _make_advisor_with_mock()
         detection = _make_detection(ThreatLevel.CONFIRMED)
         plan = advisor.assess_and_recommend(detection)
         applied = advisor.auto_apply(plan, dry_run=False, confirmed=True)
-        # Legal action should never be auto-applied
+        # Reporting action should never be auto-applied
         for title in applied:
-            assert "legal" not in title.lower()
+            assert "report" not in title.lower()
 
     def test_auto_apply_without_confirmation_returns_empty(self):
         advisor, _router = _make_advisor_with_mock()

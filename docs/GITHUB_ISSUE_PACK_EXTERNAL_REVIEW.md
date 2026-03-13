@@ -19,8 +19,8 @@ Remove silent random signing-key fallback in normal runtime for reporting artifa
 Current behavior can create artifacts that appear durable/verified but cannot be reliably verified later if the random key is lost. This is a trust-boundary problem.
 
 ### Scope
-- Review `python/goop_veil/mitigation/legal/log_exporter.py`
-- Review evidence/report generation callers
+- Review `python/goop_veil/mitigation/reporting/log_exporter.py`
+- Review report generation callers
 - Define dev/test behavior separately from normal runtime behavior
 - Ensure runtime messaging clearly communicates artifact verification state
 

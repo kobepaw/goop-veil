@@ -1,7 +1,7 @@
-"""Evidence package generator for WiFi privacy defense.
+"""Report package generator for WiFi privacy defense.
 
 Assembles detection results, device fingerprints, and alert data into a
-structured evidence package with explicitly signed logs and legal document
+structured report package with explicitly signed logs and document
 templates. Durable signed artifacts require an explicit signing key.
 """
 
@@ -9,18 +9,19 @@ from __future__ import annotations
 
 import hashlib
 import logging
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
+from typing import Any
 
-from goop_veil.config import LegalConfig
-from goop_veil.mitigation.legal.log_exporter import TimestampedLogExporter
-from goop_veil.mitigation.legal.templates import (
+from goop_veil.config import ReportingConfig
+from goop_veil.mitigation.models import ReportPackage
+from goop_veil.mitigation.reporting.log_exporter import TimestampedLogExporter
+from goop_veil.mitigation.reporting.templates import (
     DISCLAIMER,
     CeaseAndDesistTemplate,
     FCCComplaintTemplate,
     IncidentReportTemplate,
 )
-from goop_veil.mitigation.models import EvidencePackage
 from goop_veil.models import DetectionResult, ThreatLevel, VeilAlert
 
 logger = logging.getLogger(__name__)
@@ -42,22 +43,22 @@ def _mask_mac(mac: str | None) -> str:
     return ":".join(parts[:3] + ["xx", "xx", "xx"])
 
 
-class EvidencePackageGenerator:
-    """Generates legal-grade evidence packages from detection results.
+class ReportPackageGenerator:
+    """Generates report packages from detection results.
 
     Creates a directory of files including explicitly signed detection logs,
-    an evidence report, and optional legal document templates (FCC complaint,
+    a report summary, and optional document templates (FCC complaint,
     cease-and-desist, incident report). Outside explicit temporary mode, a
     signing key must be supplied directly or via VEIL_LOG_SIGNING_KEY.
     """
 
-    def __init__(self, config: LegalConfig | None = None) -> None:
-        """Initialize the evidence package generator.
+    def __init__(self, config: ReportingConfig | None = None) -> None:
+        """Initialize the report package generator.
 
         Args:
-            config: Legal configuration. Uses defaults if not provided.
+            config: Reporting configuration. Uses defaults if not provided.
         """
-        self._config = config or LegalConfig()
+        self._config = config or ReportingConfig()
         self._log_exporter = TimestampedLogExporter(
             allow_temporary_key=self._config.allow_temporary_signing
         )
@@ -74,11 +75,11 @@ class EvidencePackageGenerator:
         include_cease_desist: bool = True,
         include_incident_report: bool = False,
         redact_sensitive: bool = True,
-    ) -> EvidencePackage:
-        """Generate complete evidence package.
+    ) -> ReportPackage:
+        """Generate complete report package.
 
         Creates the following files in the output directory:
-            1. evidence_report_{timestamp}.md - Summary of all detections.
+            1. report_summary_{timestamp}.md - Summary of all detections.
             2. detection_log_{timestamp}.json - Signed raw detection data with
                verification metadata.
             3. fcc_complaint_template.md (if requested).
@@ -95,10 +96,10 @@ class EvidencePackageGenerator:
             redact_sensitive: Redact sensitive identifiers in exported artifacts.
 
         Returns:
-            EvidencePackage model with metadata about the generated package.
+            ReportPackage model with metadata about the generated package.
         """
         alerts = alerts or []
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         ts_str = now.strftime("%Y%m%d_%H%M%S")
 
         # 1. Create output directory
@@ -116,25 +117,25 @@ class EvidencePackageGenerator:
 
         # 4. Export HMAC-signed detection log
         log_path = out_dir / f"detection_log_{ts_str}.json"
-        log_hmac = self._log_exporter.export(
+        self._log_exporter.export(
             alerts, detection_results, log_path, redact_sensitive=redact_sensitive
         )
         logger.info("Signed detection log: %s", log_path)
 
-        # 5. Render and write evidence report
-        report_md = self._render_evidence_report(
+        # 5. Render and write report summary
+        report_md = self._render_report_summary(
             detection_results,
             timeline,
             redact_sensitive=redact_sensitive,
         )
-        report_path = out_dir / f"evidence_report_{ts_str}.md"
+        report_path = out_dir / f"report_summary_{ts_str}.md"
         report_path.write_text(report_md, encoding="utf-8")
-        logger.info("Evidence report: %s", report_path)
+        logger.info("Report summary: %s", report_path)
 
-        # 6. Compute SHA-256 hash of evidence report
+        # 6. Compute SHA-256 hash of report summary
         report_hash = self._hash_file(report_path)
 
-        # 7. Generate requested legal templates
+        # 7. Generate requested document templates
         detection_summary = self._build_detection_summary(detection_results)
         device_dicts = [d for d in exported_devices]
 
@@ -166,8 +167,8 @@ class EvidencePackageGenerator:
             ir_path.write_text(ir_md, encoding="utf-8")
             logger.info("Incident report template: %s", ir_path)
 
-        # 8. Build and return EvidencePackage
-        return EvidencePackage(
+        # 8. Build and return ReportPackage
+        return ReportPackage(
             timestamp=now,
             detection_results=[d.model_dump(mode="json") for d in detection_results],
             device_fingerprints=exported_devices,
@@ -177,7 +178,7 @@ class EvidencePackageGenerator:
             disclaimer=DISCLAIMER if self._config.include_disclaimer else "",
         )
 
-    def _build_timeline(self, results: list[DetectionResult]) -> list[dict]:
+    def _build_timeline(self, results: list[DetectionResult]) -> list[dict[str, str]]:
         """Build chronological timeline from detection results.
 
         Each detection result becomes one or more timeline entries sorted
@@ -189,9 +190,9 @@ class EvidencePackageGenerator:
         Returns:
             List of timeline event dicts sorted chronologically.
         """
-        events: list[dict] = []
+        events: list[dict[str, str]] = []
         for result in results:
-            event: dict = {
+            event: dict[str, str] = {
                 "timestamp": result.timestamp.isoformat(),
                 "event": f"Detection: {result.threat_level.value}",
                 "severity": result.threat_level.value,
@@ -212,7 +213,7 @@ class EvidencePackageGenerator:
         events.sort(key=lambda e: e["timestamp"])
         return events
 
-    def _extract_devices(self, results: list[DetectionResult]) -> list[dict]:
+    def _extract_devices(self, results: list[DetectionResult]) -> list[dict[str, Any]]:
         """Extract unique device fingerprints from detection results.
 
         Args:
@@ -222,7 +223,7 @@ class EvidencePackageGenerator:
             List of device dicts (deduplicated by MAC address).
         """
         seen_macs: set[str] = set()
-        devices: list[dict] = []
+        devices: list[dict[str, Any]] = []
         for result in results:
             for dev in result.devices:
                 if dev.mac_address not in seen_macs:
@@ -237,12 +238,15 @@ class EvidencePackageGenerator:
             results: Detection results to summarize.
 
         Returns:
-            Summary string suitable for embedding in legal templates.
+            Summary string suitable for embedding in templates.
         """
         if not results:
             return "No detections recorded."
 
-        highest_level = max(results, key=lambda r: _THREAT_RANK[r.threat_level]).threat_level.value
+        highest_level = max(
+            results,
+            key=lambda r: _THREAT_RANK[r.threat_level],
+        ).threat_level.value
         all_caps: set[str] = set()
         for r in results:
             for c in r.detected_capabilities:
@@ -257,20 +261,20 @@ class EvidencePackageGenerator:
             f"Total suspicious devices: {total_devices}."
         )
 
-    def _render_evidence_report(
+    def _render_report_summary(
         self,
         results: list[DetectionResult],
-        timeline: list[dict],
+        timeline: list[dict[str, str]],
         redact_sensitive: bool = True,
     ) -> str:
-        """Render the main evidence report as Markdown.
+        """Render the main report summary as Markdown.
 
         Args:
             results: Detection results to include.
             timeline: Pre-built chronological timeline.
 
         Returns:
-            Markdown-formatted evidence report.
+            Markdown-formatted report summary.
         """
         lines: list[str] = []
 
@@ -281,7 +285,7 @@ class EvidencePackageGenerator:
         lines.append("# WiFi Surveillance Detection — Evidence Report")
         lines.append("")
         lines.append(
-            f"**Generated:** {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M UTC')}"
+            f"**Generated:** {datetime.now(UTC).strftime('%Y-%m-%d %H:%M UTC')}"
         )
         lines.append("")
 
@@ -338,8 +342,10 @@ class EvidencePackageGenerator:
             lines.append("")
             lines.append(f"- **Threat Level:** {result.threat_level.value}")
             lines.append(f"- **Confidence:** {result.confidence:.2f}")
-            lines.append(f"- **Channel Hopping Detected:** {'Yes' if result.channel_hop_detected else 'No'}")
-            lines.append(f"- **Espressif Mesh Detected:** {'Yes' if result.espressif_mesh_detected else 'No'}")
+            channel_hop = "Yes" if result.channel_hop_detected else "No"
+            espressif_mesh = "Yes" if result.espressif_mesh_detected else "No"
+            lines.append(f"- **Channel Hopping Detected:** {channel_hop}")
+            lines.append(f"- **Espressif Mesh Detected:** {espressif_mesh}")
             if result.detected_capabilities:
                 caps = ", ".join(c.value for c in result.detected_capabilities)
                 lines.append(f"- **Sensing Capabilities:** {caps}")
@@ -362,10 +368,20 @@ class EvidencePackageGenerator:
             "technology, including:"
         )
         lines.append("")
-        lines.append("- Coordinated Espressif (ESP32/ESP8266) device deployments forming mesh networks.")
-        lines.append("- Anomalous beacon intervals inconsistent with standard WiFi access points.")
-        lines.append("- Rapid channel hopping patterns used for multi-frequency CSI collection.")
-        lines.append("- Periodic signal components in CSI data matching human vital sign frequencies.")
+        lines.append(
+            "- Coordinated Espressif (ESP32/ESP8266) device deployments forming "
+            "mesh networks."
+        )
+        lines.append(
+            "- Anomalous beacon intervals inconsistent with standard WiFi access points."
+        )
+        lines.append(
+            "- Rapid channel hopping patterns used for multi-frequency CSI collection."
+        )
+        lines.append(
+            "- Periodic signal components in CSI data matching human vital sign "
+            "frequencies."
+        )
         lines.append("")
 
         # Appendix
@@ -386,8 +402,8 @@ class EvidencePackageGenerator:
         return "\n".join(lines)
 
     @staticmethod
-    def _redact_devices(devices: list[dict]) -> list[dict]:
-        redacted: list[dict] = []
+    def _redact_devices(devices: list[dict[str, Any]]) -> list[dict[str, Any]]:
+        redacted: list[dict[str, Any]] = []
         for dev in devices:
             clone = dict(dev)
             clone["mac_address"] = _mask_mac(clone.get("mac_address"))

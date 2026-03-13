@@ -30,7 +30,7 @@ pip install goop-veil[cli]
 goop-veil scan
 goop-veil detect capture.pcap
 goop-veil mitigate
-goop-veil evidence capture.pcap
+goop-veil report capture.pcap
 ```
 
 ## Feedback we want

@@ -143,13 +143,13 @@ class RouterConfig(_VeilBaseConfig):
     timeout_sec: float = Field(default=30.0, gt=0.0)
 
 
-class LegalConfig(_VeilBaseConfig):
-    """T5: Legal documentation output configuration."""
+class ReportingConfig(_VeilBaseConfig):
+    """T5: Reporting/documentation output configuration."""
 
-    #: Output directory for evidence packages
-    output_dir: str = "data/legal"
+    #: Output directory for report packages
+    output_dir: str = "data/reports"
 
-    #: Include legal disclaimer in evidence packages
+    #: Include advisory disclaimer in report packages
     include_disclaimer: bool = True
 
     #: Allow random-key signing for explicit dev/test temporary artifacts only
@@ -165,8 +165,8 @@ class MitigationConfig(_VeilBaseConfig):
     #: Traffic orchestration settings
     traffic: TrafficConfig = Field(default_factory=TrafficConfig)
 
-    #: Legal documentation settings
-    legal: LegalConfig = Field(default_factory=LegalConfig)
+    #: Reporting/documentation settings
+    reporting: ReportingConfig = Field(default_factory=ReportingConfig)
 
 
 class VeilConfig(_VeilBaseConfig):

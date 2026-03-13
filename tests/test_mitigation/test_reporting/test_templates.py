@@ -1,4 +1,4 @@
-"""Tests for legal document templates.
+"""Tests for reporting templates.
 
 Validates FCC complaint, cease-and-desist, and incident report templates
 produce well-formed Markdown with required sections and disclaimers.
@@ -9,7 +9,7 @@ from __future__ import annotations
 import pytest
 
 from goop_veil.compliance import PROHIBITED_TERMS
-from goop_veil.mitigation.legal.templates import (
+from goop_veil.mitigation.reporting.templates import (
     DISCLAIMER,
     CeaseAndDesistTemplate,
     FCCComplaintTemplate,
@@ -144,7 +144,7 @@ class TestCeaseAndDesistTemplate:
         result = tpl.render()
         assert DISCLAIMER in result
 
-    def test_includes_legal_bases(self):
+    def test_includes_state_and_common_law_citations(self):
         tpl = CeaseAndDesistTemplate()
         result = tpl.render()
         # Common law always present

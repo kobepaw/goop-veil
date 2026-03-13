@@ -33,7 +33,7 @@ IEEE 802.11bf was ratified in September 2025. It standardized what researchers h
 - **Policy still lags the capability.** There is no clear federal ban on private-party WiFi CSI sensing.
 - **Practical defense tooling is still early.** goop-veil is built for detection, degradation, and documentation rather than magical prevention claims.
 
-To our knowledge, goop-veil is the first open-source tool built specifically to programmatically reconfigure existing consumer routers to fight back against WiFi CSI surveillance. It is an open-source research preview that detects potential sensing activity, applies software-only countermeasures through supported routers, and generates evidence bundles for documentation workflows.
+To our knowledge, goop-veil is the first open-source tool built specifically to programmatically reconfigure existing consumer routers to fight back against WiFi CSI surveillance. It is an open-source research preview that detects potential sensing activity, applies software-only countermeasures through supported routers, and generates report bundles for documentation workflows.
 
 ---
 
@@ -46,7 +46,7 @@ Scan your WiFi environment for sensing devices and suspicious conditions. Identi
 Software-only countermeasures applied through your existing router. No new hardware needed. Reconfigures channel, bandwidth, TX power, band steering, and PMF settings via router APIs (OpenWrt, UniFi, TP-Link). Orchestrates legitimate network traffic to degrade sensing accuracy.
 
 ### 3. Document
-Generates timestamped, HMAC-signed evidence packages for incident documentation and reporting/review workflows.
+Generates timestamped, HMAC-signed report packages for incident documentation and reporting/review workflows.
 
 goop-veil is software-only and currently positioned as a research preview. The goal is to make sensing less reliable and better documented, not to promise perfect prevention or attribution.
 
@@ -67,8 +67,8 @@ goop-veil detect capture.pcap
 # Review mitigation recommendations before applying any router changes
 goop-veil mitigate
 
-# Generate an evidence/documentation package
-goop-veil evidence capture.pcap
+# Generate a report/documentation package
+goop-veil report capture.pcap
 ```
 
 If you are evaluating router support first, see [docs/ROUTER_COMPATIBILITY.md](./docs/ROUTER_COMPATIBILITY.md).
@@ -76,6 +76,8 @@ If you are evaluating router support first, see [docs/ROUTER_COMPATIBILITY.md](.
 ---
 
 ## CLI Commands
+
+> Example outputs below are representative CLI snapshots (sample/simulated environments). Exact counts, threat levels, and recommendations vary by capture quality, RF conditions, and router capabilities.
 
 ### `goop-veil scan`
 Scan nearby WiFi networks for sensing hardware. No root required. Flags Espressif OUIs, suspicious SSIDs, and hidden networks.
@@ -104,31 +106,29 @@ Summary: Espressif mesh with CSI extraction detected on channel 6
 ```
 
 ### `goop-veil mitigate`
-Ranked countermeasure recommendations. Optionally auto-applies safe router changes.
+Ranked countermeasure recommendations. Optional router changes are only applied when explicitly requested with `--auto-apply` plus router connection details.
 
 ```
-$ goop-veil mitigate --router-host 192.168.1.1 --router-type openwrt
+$ goop-veil mitigate --pcap capture.pcap
 Mitigation Recommendations
-Threat level: HIGH
-Estimated effectiveness: 78%
+Threat level: MEDIUM
+Estimated effectiveness: 80%
 
-  #  Mitigation                Effectiveness  Difficulty  Auto  WiFi Impact
-  1  Co-channel traffic gen    53%            Easy        Y     Minimal
-  2  TX power variation        93%            Easy        Y     None
-  3  Band steering to 5 GHz   45 dB gain     Easy        Y     Minor
-  4  Channel hopping           High           Easy        Y     Brief drops
-  5  Bandwidth widening        High           Easy        Y     None
-  6  PMF (802.11w) enable      Medium         Easy        Y     None
-  7  Beacon interval increase  Medium         Easy        Y     None
+  #  Mitigation                         Effectiveness  Difficulty  Auto  WiFi Impact
+  1  Migrate to 5 GHz band              85%            easy              brief_drop
+  2  Enable TX power variation          80%            moderate          none
+  3  Switch to channel 11               75%            easy              brief_drop
+  4  Widen bandwidth to 80 MHz          65%            easy              brief_drop
+  5  Enable 802.11w PMF (required)      40%            easy              none
 ```
 
-### `goop-veil evidence capture.pcap`
-Generate an evidence package with chain-of-custody documentation.
+### `goop-veil report capture.pcap`
+Generate a report package with signed incident documentation.
 
 ```
-$ goop-veil evidence capture.pcap --output-dir data/reports
-Evidence Package Generated
-Output: data/reports/evidence_20260308_143022/
+$ goop-veil report capture.pcap --output-dir data/reports
+Report Package Generated
+Output: data/reports/
 Report hash: a3f8c91b2d4e7f01...
 Devices documented: 2
 Timeline events: 47
@@ -144,6 +144,7 @@ Captured to scan.pcap (2,847,392 bytes)
 Restored managed mode.
 
 Running detection analysis...
+# (detection report output omitted for brevity)
 ```
 
 ### `goop-veil monitor`
@@ -230,7 +231,7 @@ Reporting and regulatory outcomes are jurisdiction-specific and evolving. goop-v
 - Detection confidence is heuristic and should be treated as a lead, not a definitive attribution.
 - Mitigation effectiveness depends on router model/firmware, RF conditions, and attacker behavior.
 - Router support varies by family, model, and firmware; see [docs/ROUTER_COMPATIBILITY.md](./docs/ROUTER_COMPATIBILITY.md).
-- Evidence bundles provide integrity-oriented logging, not courtroom admissibility guarantees.
+- Report packages provide integrity-oriented logging, not courtroom admissibility guarantees.
 - The project provides technical tooling only and does not determine reporting or regulatory outcomes.
 
 ---
@@ -271,7 +272,7 @@ goop-veil exposes 7 tools via the Model Context Protocol for agent-driven WiFi d
 | `deploy_countermeasures` | BroRL-adaptive technique selection |
 | `share_sensing_signature` | Share detection signatures with federation |
 | `mitigate_wifi_sensing` | Recommend and apply router mitigations |
-| `generate_evidence_report` | Evidence package generation |
+| `generate_report_package` | Report package generation |
 
 Configure in your MCP client:
 

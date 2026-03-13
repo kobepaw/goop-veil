@@ -15,7 +15,7 @@ What is explicitly **not** included?
 Check any that apply:
 - [ ] Router state changes / auto-apply behavior
 - [ ] Security defaults / auth / transport / confirmation flow
-- [ ] Reporting / evidence / documentation artifact generation
+- [ ] Reporting / documentation artifact generation
 - [ ] Firmware / hardware behavior
 - [ ] MCP / tool invocation surface
 - [ ] Public-facing docs / README / launch copy

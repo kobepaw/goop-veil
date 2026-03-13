@@ -10,7 +10,7 @@ from unittest.mock import patch
 
 import pytest
 
-from goop_veil.mitigation.legal.log_exporter import (
+from goop_veil.mitigation.reporting.log_exporter import (
     MissingSigningKeyError,
     TimestampedLogExporter,
 )
