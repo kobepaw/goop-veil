@@ -204,7 +204,11 @@ class TestEvidencePackageModel:
         assert pkg.disclaimer == DISCLAIMER
 
     def test_disclaimer_omitted_when_config_false(self, sample_detection, tmp_path):
-        config = LegalConfig(output_dir=str(tmp_path / "no_disc"), include_disclaimer=False)
+        config = LegalConfig(
+            output_dir=str(tmp_path / "no_disc"),
+            include_disclaimer=False,
+            allow_temporary_signing=True,
+        )
         gen = EvidencePackageGenerator(config=config)
         pkg = gen.generate([sample_detection])
         assert pkg.disclaimer == ""
