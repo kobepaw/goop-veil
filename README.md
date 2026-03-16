@@ -73,6 +73,25 @@ goop-veil report capture.pcap
 
 If you are evaluating router support first, see [docs/ROUTER_COMPATIBILITY.md](./docs/ROUTER_COMPATIBILITY.md).
 
+## Contributor setup for report signing
+
+Use this path when you want locally generated report artifacts to remain verifiable after the process exits.
+
+```bash
+python - <<'PY'
+import base64, os, secrets
+print(base64.b64encode(secrets.token_bytes(32)).decode())
+PY
+export VEIL_LOG_SIGNING_KEY="<paste-base64-key-here>"
+```
+
+Artifact verification states:
+- `signed`: durably verifiable; requires an explicit signing key via `VEIL_LOG_SIGNING_KEY` or direct configuration
+- `temporary_signed`: explicit dev/test mode only; uses a random in-memory key and stops being verifiable once that key is lost
+- unsigned output: only valid when a caller intentionally chooses a non-signed path; it should not be described as signed or durable
+
+For contributor-facing caveats and limitations, also see [docs/KNOWN_LIMITATIONS.md](./docs/KNOWN_LIMITATIONS.md) and [docs/FAQ.md](./docs/FAQ.md).
+
 ---
 
 ## CLI Commands

@@ -27,6 +27,19 @@ The project is designed around local workflows. Optional sharing/integration fea
 ## Can this help with reporting?
 Yes — the project can generate documentation artifacts that may help with internal records and reporting workflows. Whether a specific response path makes sense depends on context.
 
+## How do I make report artifacts durably verifiable during local testing?
+Set `VEIL_LOG_SIGNING_KEY` before running report-generation flows. The value must be base64-encoded key material.
+
+```bash
+python - <<'PY'
+import base64, secrets
+print(base64.b64encode(secrets.token_bytes(32)).decode())
+PY
+export VEIL_LOG_SIGNING_KEY="<paste-base64-key-here>"
+```
+
+If you explicitly enable temporary dev/test signing instead, generated artifacts are only temporarily verifiable for the lifetime of that in-memory key.
+
 ## Are the report packages court-ready?
 No guarantee is made that generated artifacts will satisfy any court, regulator, or agency requirement. They are technical documentation artifacts that may help with internal review or reporting workflows.
 
