@@ -73,6 +73,20 @@ goop-veil report capture.pcap
 
 If you are evaluating router support first, see [docs/ROUTER_COMPATIBILITY.md](./docs/ROUTER_COMPATIBILITY.md).
 
+### Contributor note: evidence signing for local testing
+
+If you are working on reporting or evidence-generation paths, set `VEIL_LOG_SIGNING_KEY` before testing durable signed artifacts. Without that key, outputs should be treated as either unsigned or temporary dev/test artifacts rather than durably verifiable evidence.
+
+```bash
+python - <<'PY2'
+import base64, secrets
+print(base64.urlsafe_b64encode(secrets.token_bytes(32)).decode())
+PY2
+export VEIL_LOG_SIGNING_KEY='<paste-generated-key>'
+```
+
+Use this only for local development. Public docs and PRs should not imply courtroom, certification, or permanence guarantees for generated artifacts.
+
 ---
 
 ## CLI Commands
